@@ -9,3 +9,10 @@ body {
   width: 100vw;
   height: 100vh;
 }
+
+.year-selector {
+    z-index: 1000;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+}
