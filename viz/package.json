@@ -1,0 +1,16 @@
+{
+  "name": "viz",
+  "scripts": {
+    "start": "parcel ./median-income.html"
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "d3": "^5.9.7",
+    "leaflet": "^1.5.1"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.3"
+  }
+}

@@ -1,28 +1,28 @@
-console.log('hello world');
+const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
+
 const map = L
-  .map('map')
+  .map('map', {preferCanvas: true})
   .setView([40.691425, -73.987242], 12);
 
-L.tileLayer('https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}', {
-  maxZoom: 18,
-  id: 'mapbox.streets',
-  accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
+L.tileLayer(MAPBOX_URL, {
+    maxZoom: 18,
+    id: 'mapbox.streets',
+    accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
   })
   .addTo(map);
 
+const colorRange = d3
+  .scaleLinear()
+  .domain([10000, 120000])
+  .range(['rgba(0, 255, 0, 0)', 'rgba(0, 255, 0, 1)']);
+
 let i = 0;
 const style = (feature) => {
-  // NOTE: Would be great to pre-process the money field so we don't have to do
-  // it here
-  const income = parseInt(feature.properties['ACS_17_5_1'].replace('$', '').replace(',', '').replace('.', ''));
-
-  let fillColor = 'red';
-  if (income > 5000000) {
-    fillColor = 'blue';
-  }
+  const income = feature.properties['2017 median income']
 
   return {
-    fillColor,
+    fillColor: colorRange(income),
+    stroke: false,
   };
 };
 
