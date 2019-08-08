@@ -83,33 +83,31 @@ const selectYear = (year, options) => {
       .addTo(map);
   }
 
-  if (!bikeCheck.checked) {
-    return;
+  if (bikeCheck.checked) {
+    year = parseInt(year);
+    for (let i = 2013; i < (year + 1); i++) {
+      const stations = stationYears[i] || [];
+      stations.forEach((station) => {
+        if (station.last < year) {
+          console.log('found a disappearing station!', station)
+          return;
+        }
+        const marker = L
+          .circleMarker([station.lat, station.lon], {
+            radius: 2,
+            title: station.name,
+            stroke: true,
+            color: 'rgba(0, 0, 255, 1)',
+            fillOpacity: .8,
+            fillColor: 'rgb(81, 152, 214)',
+          });
+
+        markerLayerGroup.addLayer(marker);
+      });
+    }
+
+    markerLayerGroup.addTo(map);
   }
-
-  year = parseInt(year);
-  for (let i = 2013; i < (year + 1); i++) {
-    const stations = stationYears[i] || [];
-    stations.forEach((station) => {
-      if (station.last < year) {
-        console.log('found a disappearing station!', station)
-        return;
-      }
-      const marker = L
-        .circleMarker([station.lat, station.lon], {
-          radius: 2,
-          title: station.name,
-          stroke: true,
-          color: 'rgba(0, 0, 255, 1)',
-          fillOpacity: .8,
-          fillColor: 'rgb(81, 152, 214)',
-        });
-
-      markerLayerGroup.addLayer(marker);
-    });
-  }
-
-  markerLayerGroup.addTo(map);
 
   document.querySelectorAll('button').forEach((btn) => {
     btn.className = '';
