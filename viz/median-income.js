@@ -112,7 +112,6 @@ const selectYear = (year, options) => {
   markerLayerGroup.addTo(map);
 
   document.querySelectorAll('button').forEach((btn) => {
-    console.log(btn.className);
     btn.className = '';
     if (btn.id === 'b-' + year) {
       btn.className = 'active';
