@@ -77,9 +77,14 @@ const selectYear = (year) => {
     .geoJson(nycJson, {style: style(year)})
     .addTo(map);
 
-  for (let i = 2013; i < (parseInt(year) + 1); i++) {
+  year = parseInt(year);
+  for (let i = 2013; i < (year + 1); i++) {
     const stations = stationYears[i] || [];
     stations.forEach((station) => {
+      if (station.last < year) {
+        console.log('found a disappearing station!', station)
+        return;
+      }
       const marker = L
         .circleMarker([station.lat, station.lon], {
           radius: 2,
