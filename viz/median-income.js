@@ -33,7 +33,6 @@ const style = (year) => (feature) => {
   if (income === '250,000+') {
     income = 250000;
   } else if (isNaN(parseInt(income))) {
-    console.log(feature.properties['Neighborhood'], income);
     income = 0;
   }
 
