@@ -95,6 +95,8 @@ const selectYear = (year) => {
   }
 
   markerLayerGroup.addTo(map);
+
+  document.getElementById('year').innerHTML = year;
 };
 
 
@@ -112,4 +114,4 @@ map.on('zoomend', () => {
 });
 
 
-selectYear('2017');
+selectYear('2013');
