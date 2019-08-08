@@ -18,9 +18,10 @@ body {
     bottom: 0px;
     left: 0px;
     right: 0px;
-    justify-content: center;
+    justify-content: flex-start;
     padding: 15px;
     background: rgba(36, 36, 36, 0.7);
+    align-items: center;
 }
 
 button {
@@ -46,4 +47,10 @@ button:hover, .active {
     right: 0px;
     padding: 15px;
     text-shadow: 0px 0px 10px rgba(36, 36, 36, 0.4);
+}
+
+.check {
+    cursor: pointer;
+    color: #EEE;
+    margin-left: 10px;
 }

@@ -12,6 +12,7 @@ const stationYears = stationsJson.reduce((obj, station) => {
 
 let incomeLayerGroup;
 let markerLayerGroup;
+let currentYear;
 const map = L
   .map('map', {preferCanvas: true})
   .setView([40.691425, -73.987242], 12);
@@ -63,7 +64,10 @@ const style = (year) => (feature) => {
   };
 };
 
-const selectYear = (year) => {
+const bikeCheck = document.getElementById('b-bikes');
+const incomeCheck = document.getElementById('b-income');
+const selectYear = (year, options) => {
+  currentYear = year;
   if (incomeLayerGroup) {
     incomeLayerGroup.remove();
   }
@@ -73,9 +77,15 @@ const selectYear = (year) => {
 
   markerLayerGroup = L.layerGroup();
 
-  incomeLayerGroup = L
-    .geoJson(nycJson, {style: style(year)})
-    .addTo(map);
+  if (incomeCheck.checked) {
+    incomeLayerGroup = L
+      .geoJson(nycJson, {style: style(year)})
+      .addTo(map);
+  }
+
+  if (!bikeCheck.checked) {
+    return;
+  }
 
   year = parseInt(year);
   for (let i = 2013; i < (year + 1); i++) {
@@ -124,6 +134,9 @@ map.on('zoomend', () => {
     });
   }
 });
+
+bikeCheck.addEventListener('click', () => selectYear(currentYear));
+incomeCheck.addEventListener('click', () => selectYear(currentYear));
 
 
 selectYear('2013');
