@@ -1,16 +1,15 @@
 const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 
+
+const stationYears = stationsJson.reduce((obj, station) => {
+  const beginYear = parseInt(station.first.split('-')[0]);
+
+  return {...obj, [beginYear]: [...(obj[beginYear] || []), station]};
+}, {});
+
+
 let layer;
-const selectYear = (year) => {
-  if (layer) {
-    layer.remove();
-  }
-
-  layer = L
-    .geoJson(nycJson, {style: style(year)})
-    .addTo(map);
-};
-
+let markers = [];
 const map = L
   .map('map', {preferCanvas: true})
   .setView([40.691425, -73.987242], 12);
@@ -27,7 +26,8 @@ const colorRange = d3
   .domain([20000, 140000])
   .range(['rgba(0, 255, 0, 0)', 'rgba(0, 255, 0, 1)']);
 
-let i = 0;
+
+
 const style = (year) => (feature) => {
   let income = feature.properties[`${year} median income`];
   if (income === '250,000+') {
@@ -42,5 +42,21 @@ const style = (year) => (feature) => {
     stroke: false,
   };
 };
+
+const selectYear = (year) => {
+  if (layer) {
+    layer.remove();
+  }
+
+  layer = L
+    .geoJson(nycJson, {style: style(year)})
+    .addTo(map);
+};
+
+
+stationsJson.forEach((station) => {
+  L.marker([station.lat, station.lon], {title: station.name}).addTo(map);
+});
+
 
 selectYear('2017');
