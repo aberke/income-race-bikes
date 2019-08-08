@@ -84,9 +84,10 @@ const selectYear = (year) => {
         .circleMarker([station.lat, station.lon], {
           radius: 2,
           title: station.name,
-          stroke: false,
+          stroke: true,
+          color: 'rgba(0, 0, 255, 1)',
           fillOpacity: .8,
-          fillColor: 'rgba(0, 0, 255, 1)',
+          fillColor: 'rgb(81, 152, 214)',
         });
 
       markerLayerGroup.addLayer(marker);
