@@ -3,13 +3,15 @@ const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe
 
 const stationYears = stationsJson.reduce((obj, station) => {
   const beginYear = parseInt(station.first.split('-')[0]);
-
-  return {...obj, [beginYear]: [...(obj[beginYear] || []), station]};
+  return {
+    ...obj,
+    [beginYear]: [...(obj[beginYear] || []), station],
+  };
 }, {});
 
 
-let layer;
-let markers = [];
+let incomeLayerGroup;
+let markerLayerGroup;
 const map = L
   .map('map', {preferCanvas: true})
   .setView([40.691425, -73.987242], 12);
@@ -21,40 +23,91 @@ L.tileLayer(MAPBOX_URL, {
   })
   .addTo(map);
 
-const colorRange = d3
-  .scaleLinear()
-  .domain([20000, 140000])
-  .range(['rgba(0, 255, 0, 0)', 'rgba(0, 255, 0, 1)']);
 
+const MID_COLOR = 'rgba(73, 143, 54, .7)';
+const MID_INCOME = 140000;
+const lowColorRange = d3
+  .scaleLinear()
+  .domain([20000, MID_INCOME])
+  .range(['rgba(255, 245, 64, .2)', MID_COLOR]);
+
+const highColorRange = d3
+  .scaleLinear()
+  .domain([MID_INCOME, 300000])
+  .range([MID_COLOR, 'rgba(73, 143, 54, .9)']);
 
 
 const style = (year) => (feature) => {
+  if (year > 2017) {
+    year = 2017;
+  }
+
   let income = feature.properties[`${year} median income`];
   if (income === '250,000+') {
     income = 250000;
-  } else if (isNaN(parseInt(income))) {
-    income = 0;
+  }
+
+  let fillColor = lowColorRange(income);
+  if (isNaN(parseInt(income))) {
+    fillColor = 'rgba(0, 0, 0, 0)';
+  } else if (income < MID_INCOME) {
+    fillColor = lowColorRange(income);
+  } else {
+    fillColor = highColorRange(income);
   }
 
   return {
-    fillColor: colorRange(income),
+    fillColor,
+    fillOpacity: 1,
     stroke: false,
   };
 };
 
 const selectYear = (year) => {
-  if (layer) {
-    layer.remove();
+  if (incomeLayerGroup) {
+    incomeLayerGroup.remove();
+  }
+  if (markerLayerGroup) {
+    markerLayerGroup.remove();
   }
 
-  layer = L
+  markerLayerGroup = L.layerGroup();
+
+  incomeLayerGroup = L
     .geoJson(nycJson, {style: style(year)})
     .addTo(map);
+
+  for (let i = 2013; i < (parseInt(year) + 1); i++) {
+    const stations = stationYears[i] || [];
+    stations.forEach((station) => {
+      const marker = L
+        .circleMarker([station.lat, station.lon], {
+          radius: 2,
+          title: station.name,
+          stroke: false,
+          fillOpacity: .8,
+          fillColor: 'rgba(0, 0, 255, 1)',
+        });
+
+      markerLayerGroup.addLayer(marker);
+    });
+  }
+
+  markerLayerGroup.addTo(map);
 };
 
 
-stationsJson.forEach((station) => {
-  L.marker([station.lat, station.lon], {title: station.name}).addTo(map);
+map.on('zoomend', () => {
+  const currentZoom = map.getZoom();
+  if (currentZoom >= 14) {
+    markerLayerGroup.eachLayer((marker) => {
+      marker.setRadius(5);
+    });
+  } else {
+    markerLayerGroup.eachLayer((marker) => {
+      marker.setRadius(2);
+    });
+  }
 });
 
 
