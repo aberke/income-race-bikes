@@ -1,6 +1,51 @@
 const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 
+let map;
+let incomeLayerGroup;
+let bikeStationMarkerLayerGroup;
+let currentYear;
+let currentOptions;
 
+const INITIAL_ZOOM_LEVEL = 12;
+const MAX_ZOOM_LEVEL = 18;
+
+
+const setup = function() {
+  // set up the map
+
+  map = L
+    .map('map', {preferCanvas: true})
+    .setView([40.691425, -73.987242], INITIAL_ZOOM_LEVEL);
+
+  L.tileLayer(MAPBOX_URL, {
+      maxZoom: MAX_ZOOM_LEVEL,
+      id: 'mapbox.streets',
+      accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
+    })
+    .addTo(map);
+
+
+  // set up listeners
+  map.on('zoomend', () => {
+    const currentZoom = map.getZoom();
+    if (currentZoom >= 14) {
+      bikeStationMarkerLayerGroup.eachLayer((marker) => {
+        marker.setRadius(5);
+      });
+    } else {
+      bikeStationMarkerLayerGroup.eachLayer((marker) => {
+        marker.setRadius(2);
+      });
+    }
+  });
+
+
+  selectYear(2013);
+
+}
+
+// Set up station years as an object mapping 
+// {(int)first year for station: [list of station ids]}
 const stationYears = stationsJson.reduce((obj, station) => {
   const beginYear = parseInt(station.first.split('-')[0]);
   return {
@@ -10,35 +55,25 @@ const stationYears = stationsJson.reduce((obj, station) => {
 }, {});
 
 
-let incomeLayerGroup;
-let markerLayerGroup;
-let currentYear;
-const map = L
-  .map('map', {preferCanvas: true})
-  .setView([40.691425, -73.987242], 12);
-
-L.tileLayer(MAPBOX_URL, {
-    maxZoom: 18,
-    id: 'mapbox.streets',
-    accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
-  })
-  .addTo(map);
 
 
-const MID_COLOR = 'rgba(73, 143, 54, .7)';
-const MID_INCOME = 140000;
+const PIECEWISE_GRADIENT_SCALE_MID_COLOR = 'rgba(73, 143, 54, .7)';
+const PIECEWISE_GRADIENT_SCALE_MID_INCOME = 140000;
 const lowColorRange = d3
   .scaleLinear()
-  .domain([20000, MID_INCOME])
-  .range(['rgba(255, 245, 64, .2)', MID_COLOR]);
+  .domain([20000, PIECEWISE_GRADIENT_SCALE_MID_INCOME])
+  .range(['rgba(255, 245, 64, .2)', PIECEWISE_GRADIENT_SCALE_MID_COLOR]);
 
 const highColorRange = d3
   .scaleLinear()
-  .domain([MID_INCOME, 300000])
-  .range([MID_COLOR, 'rgba(73, 143, 54, .9)']);
+  .domain([PIECEWISE_GRADIENT_SCALE_MID_INCOME, 300000])
+  .range([PIECEWISE_GRADIENT_SCALE_MID_COLOR, 'rgba(73, 143, 54, .9)']);
 
 
-const style = (year) => (feature) => {
+const incomeStyle = (year) => (feature) => {
+  // Each feature is a geoJSON object with information for each year.
+  // Returns style based on year of interest.
+  // Income data goes up to this year, so use that max year's data for years beyond
   if (year > 2017) {
     year = 2017;
   }
@@ -51,7 +86,7 @@ const style = (year) => (feature) => {
   let fillColor = lowColorRange(income);
   if (isNaN(parseInt(income))) {
     fillColor = 'rgba(0, 0, 0, 0)';
-  } else if (income < MID_INCOME) {
+  } else if (income < PIECEWISE_GRADIENT_SCALE_MID_INCOME) {
     fillColor = lowColorRange(income);
   } else {
     fillColor = highColorRange(income);
@@ -64,76 +99,112 @@ const style = (year) => (feature) => {
   };
 };
 
-const bikeCheck = document.getElementById('b-bikes');
-const incomeCheck = document.getElementById('b-income');
-const selectYear = (year, options) => {
-  currentYear = year;
-  if (incomeLayerGroup) {
+const redrawIncomeLayer = () => {
+  removeIncomeLayer();
+  addIncomeLayer();
+}
+
+const redrawBikeStationLayer = () => {
+  removeBikeStationLayer();
+  addBikeStationLayer();
+}
+
+
+const removeIncomeLayer = () => {
+  if (incomeLayerGroup)
     incomeLayerGroup.remove();
+}
+
+const addIncomeLayer = () => {
+  incomeLayerGroup = L
+    .geoJson(nycJson, {style: incomeStyle(currentYear)})
+    .addTo(map);
+}
+
+const removeBikeStationLayer = () => {
+  if (bikeStationMarkerLayerGroup) {
+    bikeStationMarkerLayerGroup.remove();
   }
-  if (markerLayerGroup) {
-    markerLayerGroup.remove();
+}
+
+const addBikeStationLayer = () => {
+  bikeStationMarkerLayerGroup = L.layerGroup();
+  for (let i = 2013; i < (currentYear + 1); i++) {
+    const stations = stationYears[i] || [];
+    stations.forEach((station) => {
+      if (station.last < currentYear) {
+        console.log('found a disappearing station!', station)
+        return;
+      }
+      const marker = L
+        .circleMarker([station.lat, station.lon], {
+          radius: 2,
+          title: station.name,
+          stroke: true,
+          color: 'rgba(0, 0, 255, 1)',
+          fillOpacity: .8,
+          fillColor: 'rgb(81, 152, 214)',
+        });
+
+      bikeStationMarkerLayerGroup.addLayer(marker);
+    });
   }
 
-  markerLayerGroup = L.layerGroup();
+  bikeStationMarkerLayerGroup.addTo(map);
+}
 
-  if (incomeCheck.checked) {
-    incomeLayerGroup = L
-      .geoJson(nycJson, {style: style(year)})
-      .addTo(map);
+
+
+const selectYear = (year) => {
+  year = parseInt(year);
+  if (year == currentYear) {
+    return;
   }
+  currentYear = year;
 
-  if (bikeCheck.checked) {
-    year = parseInt(year);
-    for (let i = 2013; i < (year + 1); i++) {
-      const stations = stationYears[i] || [];
-      stations.forEach((station) => {
-        if (station.last < year) {
-          console.log('found a disappearing station!', station)
-          return;
-        }
-        const marker = L
-          .circleMarker([station.lat, station.lon], {
-            radius: 2,
-            title: station.name,
-            stroke: true,
-            color: 'rgba(0, 0, 255, 1)',
-            fillOpacity: .8,
-            fillColor: 'rgb(81, 152, 214)',
-          });
+  if (incomeCheck.checked)
+    redrawIncomeLayer();
 
-        markerLayerGroup.addLayer(marker);
-      });
-    }
+  if (bikeCheck.checked)
+    redrawBikeStationLayer();
 
-    markerLayerGroup.addTo(map);
-  }
 
   document.querySelectorAll('button').forEach((btn) => {
     btn.className = '';
-    if (btn.id === 'b-' + year) {
+    if (btn.id === 'b-' + currentYear.toString()) {
       btn.className = 'active';
     }
   });
-  document.getElementById('year').innerHTML = year;
+  document.getElementById('year').innerHTML = currentYear.toString();
 };
 
 
-map.on('zoomend', () => {
-  const currentZoom = map.getZoom();
-  if (currentZoom >= 14) {
-    markerLayerGroup.eachLayer((marker) => {
-      marker.setRadius(5);
-    });
-  } else {
-    markerLayerGroup.eachLayer((marker) => {
-      marker.setRadius(2);
-    });
+const bikeCheck = document.getElementById('b-bikes');
+const incomeCheck = document.getElementById('b-income');
+
+
+
+const toggleBikeStationLayer = () => {
+  if (bikeCheck.checked)
+    redrawBikeStationLayer();
+  else
+    removeBikeStationLayer();
+}
+
+
+const toggleIncomeLayer = () => {
+  if (incomeCheck.checked) {
+    redrawIncomeLayer();
+    // markers layer should be above income layer coloring -- so maybe show it
+    redrawBikeStationLayer();
   }
-});
+  else {
+    removeIncomeLayer();
+  }
+}
 
-bikeCheck.addEventListener('click', () => selectYear(currentYear));
-incomeCheck.addEventListener('click', () => selectYear(currentYear));
+bikeCheck.addEventListener('click', toggleBikeStationLayer);
+incomeCheck.addEventListener('click', toggleIncomeLayer);
 
 
-selectYear('2013');
+setup();
