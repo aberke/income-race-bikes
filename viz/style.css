@@ -54,3 +54,29 @@ button:hover, .active {
     color: #EEE;
     margin-left: 10px;
 }
+
+/*
+leaflet things
+*/
+
+/*
+tool tip / pop up
+there is a pop up / tool tip for the bike station markers 
+*/
+
+.bike-station-info-popup {
+    color: black;
+    font-size: 1em;
+}
+.bike-station-info-popup .bike-station-name {
+    font-weight: bold;
+}
+
+/*leaflet override*/
+.map .leaflet-popup-content-wrapper,
+.map .leaflet-popup-tip {
+    box-shadow: none;
+    border-radius: 0;
+    background-color: rgba(81, 152, 214, 0.9);
+}
+

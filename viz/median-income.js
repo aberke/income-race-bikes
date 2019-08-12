@@ -127,6 +127,15 @@ const removeBikeStationLayer = () => {
   }
 }
 
+const getBikeStationInfoPopup = (station) => {
+  let dateString = new Date(station.first).toDateString();
+  return `<div class='bike-station-info-popup'>
+            <p class='bike-station-name'>${station.name}</p>
+            <p>First ride: ${dateString}</p>
+          </div>`;
+
+}
+
 const addBikeStationLayer = () => {
   bikeStationMarkerLayerGroup = L.layerGroup();
   for (let i = 2013; i < (currentYear + 1); i++) {
@@ -144,7 +153,8 @@ const addBikeStationLayer = () => {
           color: 'rgba(0, 0, 255, 1)',
           fillOpacity: .8,
           fillColor: 'rgb(81, 152, 214)',
-        });
+        })
+        .bindPopup(getBikeStationInfoPopup(station));
 
       bikeStationMarkerLayerGroup.addLayer(marker);
     });
