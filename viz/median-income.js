@@ -1,5 +1,7 @@
 const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 
+let censusTractDataGeojson;
+
 let map;
 let censusTractInfoLayerGroup;
 
@@ -153,7 +155,7 @@ const redrawBikeStationLayer = (previousYear, currentYear) => {
 
 const makeCensusTractInfoLayer = () => {
   censusTractInfoLayerGroup = L
-    .geoJson(nycJson, {
+    .geoJson(censusTractDataGeojson, {
       onEachFeature: handleCensusTractInfoLayerFeature,
       style: censusTractFeatureStyleDefault,
     });  
@@ -175,7 +177,7 @@ const addRaceLayer = (year=currentYear) => {
   // Census data only goes up to 2017, so 2017 data used for years onward
   year = (year > 2017) ? 2017 : year;
   if (!raceLayerGroups[year])
-    raceLayerGroups[year] = L.geoJson(nycJson, {filter: () => false});//{style: raceStyle(year)});
+    raceLayerGroups[year] = L.geoJson(censusTractDataGeojson, {filter: () => false});//{style: raceStyle(year)});
   raceLayerGroups[year].addTo(map);
 }
 
@@ -189,7 +191,7 @@ const addIncomeLayer = (year=currentYear) => {
   // Census data only goes up to 2017, so 2017 data used for years onward
   year = (year > 2017) ? 2017 : year;
   if (!incomeLayerGroups[year])
-    incomeLayerGroups[year] = L.geoJson(nycJson, {style: incomeStyle(year)});
+    incomeLayerGroups[year] = L.geoJson(censusTractDataGeojson, {style: incomeStyle(year)});
   incomeLayerGroups[year].addTo(map);
 }
 
@@ -312,4 +314,18 @@ incomeCheck.addEventListener('click', toggleIncomeLayer);
 raceCheck.addEventListener('click', toggleRaceLayer);
 
 
-setup();
+// load the data
+let xhr = new XMLHttpRequest();
+xhr.open('GET', './nyc-census-tracts-data.geojson');
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.responseType = 'json';
+xhr.onload = function() {
+  if (xhr.status !== 200) {
+    console.error('loading geojson returned status code', xhr.status);
+    return;
+  }
+  censusTractDataGeojson = xhr.response;
+  setup();
+};
+xhr.send();
+
