@@ -79,11 +79,9 @@ const highColorRange = d3
   .range([PIECEWISE_GRADIENT_SCALE_MID_COLOR, 'rgba(73, 143, 54, .9)']);
 
 
-const incomeStyle = (feature) => {
+const incomeStyle = (year) => (feature) => {
   // Each feature is a geoJSON object with information for each year.
   // Returns style based on year of interest.
-  // Income data goes up to this year, so use that max year's data for years beyond
-  let year = (currentYear > 2017) ? 2017 : currentYear;
 
   let income = feature.properties[`${year} median income`];
   if (income === '250,000+') {
@@ -138,6 +136,11 @@ const handleCensusTractInfoLayerFeature = (feature, layer) => {
     })(layer, feature.properties);
 }
 
+const redrawRaceLayer = (previousYear, currentYear) => {
+  removeRaceLayer(previousYear);
+  addRaceLayer(currentYear);
+}
+
 const redrawIncomeLayer = (previousYear, currentYear) => {
   removeIncomeLayer(previousYear);
   addIncomeLayer(currentYear);
@@ -162,6 +165,20 @@ const addCensusTractInfoLayer = () => {
   map.addLayer(censusTractInfoLayerGroup);
 }
 
+const removeRaceLayer = (year=currentYear) => {
+  if (!!raceLayerGroups[year] && map.hasLayer(raceLayerGroups[year]))
+    map.removeLayer(raceLayerGroups[year]);
+}
+
+const addRaceLayer = (year=currentYear) => {
+  console.log('addRaceLayer TODO!!')
+  // Census data only goes up to 2017, so 2017 data used for years onward
+  year = (year > 2017) ? 2017 : year;
+  if (!raceLayerGroups[year])
+    raceLayerGroups[year] = L.geoJson(nycJson, {filter: () => false});//{style: raceStyle(year)});
+  raceLayerGroups[year].addTo(map);
+}
+
 
 const removeIncomeLayer = (year=currentYear) => {
   if (!!incomeLayerGroups[year] && map.hasLayer(incomeLayerGroups[year]))
@@ -169,8 +186,10 @@ const removeIncomeLayer = (year=currentYear) => {
 }
 
 const addIncomeLayer = (year=currentYear) => {
+  // Census data only goes up to 2017, so 2017 data used for years onward
+  year = (year > 2017) ? 2017 : year;
   if (!incomeLayerGroups[year])
-    incomeLayerGroups[year] = L.geoJson(nycJson, {style: incomeStyle});
+    incomeLayerGroups[year] = L.geoJson(nycJson, {style: incomeStyle(year)});
   incomeLayerGroups[year].addTo(map);
 }
 
@@ -230,6 +249,9 @@ const selectYear = (year) => {
   if (incomeCheck.checked)
     redrawIncomeLayer(previousYear, currentYear);
 
+  if (raceCheck.checked)
+    redrawRaceLayer(previousYear, currentYear);
+
   if (bikeCheck.checked)
     redrawBikeStationLayer(previousYear, currentYear);
 
@@ -251,6 +273,7 @@ const selectYear = (year) => {
 
 const bikeCheck = document.getElementById('b-bikes');
 const incomeCheck = document.getElementById('b-income');
+const raceCheck = document.getElementById('b-race');
 
 
 
@@ -261,6 +284,17 @@ const toggleBikeStationLayer = () => {
     removeBikeStationLayer(currentYear);
 }
 
+
+const toggleRaceLayer = () => {
+  if (raceCheck.checked) {
+    redrawRaceLayer(currentYear, currentYear);
+    // markers layer should be above income layer coloring -- so maybe show it
+    redrawBikeStationLayer(currentYear, currentYear);
+  }
+  else {
+    removeRaceLayer(currentYear);
+  }
+}
 
 const toggleIncomeLayer = () => {
   if (incomeCheck.checked) {
@@ -275,6 +309,7 @@ const toggleIncomeLayer = () => {
 
 bikeCheck.addEventListener('click', toggleBikeStationLayer);
 incomeCheck.addEventListener('click', toggleIncomeLayer);
+raceCheck.addEventListener('click', toggleRaceLayer);
 
 
 setup();
