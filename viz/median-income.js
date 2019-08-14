@@ -316,7 +316,8 @@ raceCheck.addEventListener('click', toggleRaceLayer);
 
 // load the data
 let xhr = new XMLHttpRequest();
-xhr.open('GET', './nyc-census-tracts-data.geojson');
+xhr.open('GET', './viz/nyc-census-tracts-data.geojson');
+// xhr.open('GET', './data/ny/nyc-census-tracts-data.geojson');
 xhr.setRequestHeader('Content-Type', 'application/json');
 xhr.responseType = 'json';
 xhr.onload = function() {
