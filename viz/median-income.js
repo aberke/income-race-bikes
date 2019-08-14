@@ -20,7 +20,10 @@ const MAX_ZOOM_LEVEL = 18;
 const setup = function() {
   // set up the map
   map = L
-    .map('map', {preferCanvas: true})
+    .map('map', {
+      preferCanvas: true,
+      zoomControl:false,
+    })
     .setView([40.691425, -73.987242], INITIAL_ZOOM_LEVEL);
 
   L.tileLayer(MAPBOX_URL, {
@@ -85,9 +88,9 @@ const incomeStyle = (year) => (feature) => {
   // Each feature is a geoJSON object with information for each year.
   // Returns style based on year of interest.
 
-  let income = feature.properties[`${year} median income`];
+  let income = getTractData(feature.properties, TRACT_MEDIAN_INCOME_KEY);
   if (income === '250,000+') {
-    income = 250000;
+    income = 250000; // TODO
   }
 
   let fillColor = lowColorRange(income);
@@ -120,17 +123,93 @@ const censusTractFeatureStyleDefault = {
   fill: false,
 };
 
+// Using constants for property keys from the geojson to allow compression (TODO)
+NYC_TRACT_NAME_KEY = 'Neighborhood';
+
+
+TRACT_MEDIAN_INCOME_KEY = 'median income';
+TRACT_MEDIAN_INCOME_MARGIN_OF_ERROR_KEY = 'median income margin of error';
+TRACT_TOTAL_HOUSEHOLDS_KEY = 'race: total households';
+TRACT_TOTAL_HOUSEHOLDS_MARGIN_OF_ERROR_KEY = 'race: total households margin of error';
+TRACT_WHITE_HOUSEHOLDS_KEY = 'race: White';
+TRACT_BLACK_HOUSEHOLDS_KEY = 'race: Black';
+TRACT_ASIAN_HOUSEHOLDS_KEY = 'race: Asian';
+TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY = 'race: 2 or more races';
+TRACT_OTHER_HOUSEHOLDS_KEY = 'race: Other';
+
+const cityElt = document.getElementById('city');
+const yearElt = document.getElementById('year');
+const tractNameElt = document.getElementById('tract-name');
+const tractMedianIncomeElt = document.getElementById('tract-median-income');
+const tractPercentWhiteElt = document.getElementById('tract-percent-white');
+const tractWhiteHouseholdsElt = document.getElementById('tract-white-households');
+const tractBlackHouseholdsElt = document.getElementById('tract-black-households');
+const tractAsianHouseholdsElt = document.getElementById('tract-asian-households');
+const tractOtherHouseholdsElt = document.getElementById('tract-other-households');
+const tractTwoOrMoreRacesHouseholdsElt = document.getElementById('tract-two-or-more-races-households');
+const tractTotalHouseholdsElt = document.getElementById('tract-total-households');
+const tractTotalHouseholdsMarginOfErrorElt = document.getElementById('tract-total-households-margin-of-error');
+
+// TODO: move this to a utility specific file
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+const getTractData = (properties, key, year=currentYear) => {
+  // The data should be a number
+  return properties[year + ' ' + key];
+}
+const getFormattedTractData = (properties, key, year=currentYear) => {
+  // The data should be a number
+  let value = getTractData(properties, key, year);
+  value = parseInt(value);
+  if (isNaN(value))
+    return 'insufficient data';
+  return numberWithCommas(value);
+}
+
+const getTractPercentWhite = (properties, year=currentYear) => {
+  let whiteCount = parseInt(properties[year + ' ' + TRACT_WHITE_HOUSEHOLDS_KEY]);
+  let totalCount = parseInt(properties[year + ' ' + TRACT_TOTAL_HOUSEHOLDS_KEY]);
+  if (isNaN(whiteCount) || whiteCount < 1 || isNaN(totalCount) || totalCount < 1)
+    return 'n/a';
+  return ((whiteCount/totalCount)*100).toFixed().toString() + '%';
+}
+
+const fillTractInfoBox = (properties) => {
+  tractNameElt.innerHTML = properties[NYC_TRACT_NAME_KEY];
+  tractMedianIncomeElt.innerHTML = 'Median income: $' + getFormattedTractData(properties, TRACT_MEDIAN_INCOME_KEY);
+  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getTractPercentWhite(properties, currentYear);
+  tractWhiteHouseholdsElt.innerHTML = 'White households: ' + getFormattedTractData(properties, TRACT_WHITE_HOUSEHOLDS_KEY);
+  tractBlackHouseholdsElt.innerHTML = 'Black households: ' + getFormattedTractData(properties, TRACT_BLACK_HOUSEHOLDS_KEY);
+  tractAsianHouseholdsElt.innerHTML = 'Asian households: ' + getFormattedTractData(properties, TRACT_ASIAN_HOUSEHOLDS_KEY);
+  tractOtherHouseholdsElt.innerHTML = 'Other households: ' + getFormattedTractData(properties, TRACT_OTHER_HOUSEHOLDS_KEY);
+  tractTwoOrMoreRacesHouseholdsElt.innerHTML = 'Households w/ multiple races: ' + getFormattedTractData(properties, TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY);
+  tractTotalHouseholdsElt.innerHTML = 'Total households: ' + getFormattedTractData(properties, TRACT_TOTAL_HOUSEHOLDS_KEY);
+  tractTotalHouseholdsMarginOfErrorElt.innerHTML = 'margin of error: ' + getFormattedTractData(properties, TRACT_TOTAL_HOUSEHOLDS_MARGIN_OF_ERROR_KEY);
+}
+
+const emptyTractInfoBox = () => {
+  tractNameElt.innerHTML = '';
+  tractMedianIncomeElt.innerHTML = '';
+  tractPercentWhiteElt.innerHTML = '';
+  tractWhiteHouseholdsElt.innerHTML = '';
+  tractBlackHouseholdsElt.innerHTML = '';
+  tractAsianHouseholdsElt.innerHTML = '';
+  tractOtherHouseholdsElt.innerHTML = '';
+  tractTwoOrMoreRacesHouseholdsElt.innerHTML = '';
+  tractTotalHouseholdsElt.innerHTML = '';
+  tractTotalHouseholdsMarginOfErrorElt.innerHTML = '';
+}
+
 const handleCensusTractInfoLayerFeature = (feature, layer) => {
     (function(layer, properties) {
       layer.on('mouseover', function (e) {
-        console.log('layer mouseover', layer, properties)
         // Change the style to the highlighted version
         layer.setStyle(censusTractFeatureStyleHighlight);
+        fillTractInfoBox(properties);
       });
-      // Create a mouseout event that undoes the mouseover changes
       layer.on('mouseout', function (e) {
-        console.log('mouseout')
-        // revert the style back
+        emptyTractInfoBox();
         layer.setStyle(censusTractFeatureStyleDefault);
       });
       // Close the "anonymous" wrapper function, and call it while passing
@@ -265,17 +344,12 @@ const selectYear = (year) => {
 
   document.querySelectorAll('button').forEach((btn) => {
     btn.className = '';
-    if (btn.id === 'b-' + currentYear.toString()) {
+    if (btn.id === 'b-' + year.toString()) {
       btn.className = 'active';
     }
   });
-  document.getElementById('year').innerHTML = currentYear.toString();
+  yearElt.innerHTML = year.toString();
 };
-
-
-const bikeCheck = document.getElementById('b-bikes');
-const incomeCheck = document.getElementById('b-income');
-const raceCheck = document.getElementById('b-race');
 
 
 
@@ -309,6 +383,10 @@ const toggleIncomeLayer = () => {
   }
 }
 
+
+const bikeCheck = document.getElementById('b-bikes');
+const incomeCheck = document.getElementById('b-income');
+const raceCheck = document.getElementById('b-race');
 bikeCheck.addEventListener('click', toggleBikeStationLayer);
 incomeCheck.addEventListener('click', toggleIncomeLayer);
 raceCheck.addEventListener('click', toggleRaceLayer);
