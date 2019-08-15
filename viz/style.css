@@ -1,7 +1,6 @@
 body {
     font-family: 'Helvetica', arial, sans-serif;
     background-color: #EEE;
-    color: blue;
     padding: 0px;
     margin: 0px;
 }
@@ -12,33 +11,29 @@ body {
 }
 
 .year-selector {
-    display: flex;
-    z-index: 1000;
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    justify-content: flex-start;
-    padding: 15px;
-    background: rgba(36, 36, 36, 0.7);
-    align-items: center;
+    
 }
-
-button {
+.year-selector button{
     font-family: 'Helvetica', arial, sans-serif;
-    font-size: 18px;
-    background: rgba(36, 36, 36, 1);
-    color: #EEE;
+    font-size: 16px;
     border: 0px;
-    padding: 10px 20px;
+    padding: 3px 5px;
     cursor: pointer;
+    display: block;
+    background-color: black;
+    color: white;
+    margin: 1px;
 }
 
-button:hover, .active {
-    background: #00B4FF;
+.year-selector button:hover, .year-selector button.active {
+    background: gray;
+    color: black;
+}
+.year-selector button.active {
+    background: white;
 }
 
-#tract-info-container {
+#text-container {
     z-index: 2000;
     background-color: rgba(0,0,0,0.7);
     border: 1px solid gray;
@@ -48,8 +43,13 @@ button:hover, .active {
     position: fixed;
     top: 0px;
     left: 0px;
+    bottom: 0;
     padding: 15px;
     width: 220px;
+    overflow-y: scroll;
+}
+#tract-info-container {
+    height: 280px;
 }
 #year {
     font-size: 36px;
@@ -72,11 +72,100 @@ button:hover, .active {
     font-size: 0.85em;
 }
 
-.check {
-    cursor: pointer;
-    color: #EEE;
-    margin-left: 10px;
+.show-data-check {
+    margin-top: 15px;
 }
+
+/* check box things */
+.checkbox-container {
+    cursor: pointer;
+    display: block;
+    position: relative;
+    padding-left: 35px;
+    margin-bottom: 12px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.checkbox-container input:checked ~ .checkmark {
+  background-color: black;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "x";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.checkbox-container .checkmark:after {
+  left: 5px;
+}
+
+#income-legend {
+
+}
+#income-legend-bar {
+    background: -webkit-linear-gradient(90deg, rgba(255, 245, 64, .2), rgba(73, 143, 54, .9)); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(90deg, rgba(255, 245, 64, .2), rgba(73, 143, 54, .9)); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(90deg, rgba(255, 245, 64, .2), rgba(73, 143, 54, .9)); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(90deg, rgba(255, 245, 64, .2), rgba(73, 143, 54, .9)); /* Standard syntax */
+
+    background-color: white;
+}
+#race-legend-bar {
+    background: -webkit-linear-gradient(90deg, rgba(171, 151, 219, 0.7), rgba(22, 133, 199, 0.9)); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(90deg, rgba(171, 151, 219, 0.7), rgba(22, 133, 199, 0.9)); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(90deg, rgba(171, 151, 219, 0.7), rgba(22, 133, 199, 0.9)); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(90deg, rgba(171, 151, 219, 0.7), rgba(22, 133, 199, 0.9)); /* Standard syntax */
+
+    background-color: white;
+}
+.legend-bar {
+    width: 100px;
+    height: 20px;
+    background-color: white;
+    display: inline-block;
+}
+.legend-end-num {
+    font-size: 13px;
+    vertical-align: text-top;
+}
+
+
 
 /*
 leaflet things

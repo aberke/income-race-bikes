@@ -55,7 +55,6 @@ const setup = function() {
 
   addCensusTractInfoLayer();
   selectYear(2013);
-
 }
 
 // Set up station years as an object mapping 
@@ -71,17 +70,40 @@ const stationYears = stationsJson.reduce((obj, station) => {
 
 
 
-const PIECEWISE_GRADIENT_SCALE_MID_COLOR = 'rgba(73, 143, 54, .7)';
-const PIECEWISE_GRADIENT_SCALE_MID_INCOME = 140000;
-const lowColorRange = d3
-  .scaleLinear()
-  .domain([20000, PIECEWISE_GRADIENT_SCALE_MID_INCOME])
-  .range(['rgba(255, 245, 64, .2)', PIECEWISE_GRADIENT_SCALE_MID_COLOR]);
+const raceStyle = (year) => (feature) => {
+  // Each feature is a geoJSON object with information for each year.
+  // Returns style based on year of interest.
+  let percentWhite = getTractPercentWhite(feature.properties, year);
+  let fillColor = 'rgba(0, 0, 0, 0)';
+  if (!!percentWhite)
+    fillColor = raceColorRange(percentWhite);
 
-const highColorRange = d3
+  return {
+    fillColor: fillColor,
+    fillOpacity: 1,
+    stroke: false,
+  };
+};
+
+const RACE_GRADIENT_START = 'rgba(171, 151, 219, 0.5)';
+const RACE_GRADIENT_END = 'rgba(22, 133, 199, 0.7)';
+const raceColorRange = d3
   .scaleLinear()
-  .domain([PIECEWISE_GRADIENT_SCALE_MID_INCOME, 300000])
-  .range([PIECEWISE_GRADIENT_SCALE_MID_COLOR, 'rgba(73, 143, 54, .9)']);
+  .domain([0, 100])
+  .range([RACE_GRADIENT_START, RACE_GRADIENT_END]);
+
+
+const PIECEWISE_INCOME_GRADIENT_SCALE_MID_COLOR = 'rgba(73, 143, 54, .7)';
+const PIECEWISE_INCOME_GRADIENT_SCALE_MID = 140000;
+const lowIncomeColorRange = d3
+  .scaleLinear()
+  .domain([20000, PIECEWISE_INCOME_GRADIENT_SCALE_MID])
+  .range(['rgba(255, 245, 64, .2)', PIECEWISE_INCOME_GRADIENT_SCALE_MID_COLOR]);
+
+const highIncomeColorRange = d3
+  .scaleLinear()
+  .domain([PIECEWISE_INCOME_GRADIENT_SCALE_MID, 300000])
+  .range([PIECEWISE_INCOME_GRADIENT_SCALE_MID_COLOR, 'rgba(73, 143, 54, .9)']);
 
 
 const incomeStyle = (year) => (feature) => {
@@ -90,16 +112,16 @@ const incomeStyle = (year) => (feature) => {
 
   let income = getTractData(feature.properties, TRACT_MEDIAN_INCOME_KEY);
   if (income === '250,000+') {
-    income = 250000; // TODO
+    income = 300000;
   }
 
-  let fillColor = lowColorRange(income);
+  let fillColor;
   if (isNaN(parseInt(income))) {
     fillColor = 'rgba(0, 0, 0, 0)';
-  } else if (income < PIECEWISE_GRADIENT_SCALE_MID_INCOME) {
-    fillColor = lowColorRange(income);
+  } else if (income < PIECEWISE_INCOME_GRADIENT_SCALE_MID) {
+    fillColor = lowIncomeColorRange(income);
   } else {
-    fillColor = highColorRange(income);
+    fillColor = highIncomeColorRange(income);
   }
 
   return {
@@ -167,25 +189,46 @@ const getFormattedTractData = (properties, key, year=currentYear) => {
   return numberWithCommas(value);
 }
 
+const getMarginOfError = (properties, year=currentYear) => {
+  let value = parseInt(getTractData(properties, TRACT_TOTAL_HOUSEHOLDS_MARGIN_OF_ERROR_KEY, year))
+  let medIncome = parseInt(getTractData(properties, TRACT_MEDIAN_INCOME_KEY, year));
+  let totalHouseholds = parseInt(getTractData(properties, TRACT_TOTAL_HOUSEHOLDS_KEY, year));
+  if (isNaN(value) || isNaN(totalHouseholds) || totalHouseholds < 1)
+    return 'n/a';
+  return numberWithCommas(value);
+}
+
+const getFormattedMedianIncome = (properties, year=currentYear) => {
+  let value = parseInt(getTractData(properties, TRACT_MEDIAN_INCOME_KEY, year));
+  if (isNaN(value) || value < 1)
+    return 'insufficient data';
+  return '$' + numberWithCommas(value);
+}
+
 const getTractPercentWhite = (properties, year=currentYear) => {
   let whiteCount = parseInt(properties[year + ' ' + TRACT_WHITE_HOUSEHOLDS_KEY]);
   let totalCount = parseInt(properties[year + ' ' + TRACT_TOTAL_HOUSEHOLDS_KEY]);
   if (isNaN(whiteCount) || whiteCount < 1 || isNaN(totalCount) || totalCount < 1)
-    return 'n/a';
-  return ((whiteCount/totalCount)*100).toFixed().toString() + '%';
+    return;
+  return ((whiteCount/totalCount)*100).toFixed();
+}
+
+const getFormattedPercentWhite = (properties, year=currentYear) => {
+  let value = getTractPercentWhite(properties, year);
+  return (!!value) ? (value.toString() + '%') : 'n/a';
 }
 
 const fillTractInfoBox = (properties) => {
   tractNameElt.innerHTML = properties[NYC_TRACT_NAME_KEY];
-  tractMedianIncomeElt.innerHTML = 'Median income: $' + getFormattedTractData(properties, TRACT_MEDIAN_INCOME_KEY);
-  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getTractPercentWhite(properties, currentYear);
+  tractMedianIncomeElt.innerHTML = 'Median income: ' + getFormattedMedianIncome(properties, currentYear);
+  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getFormattedPercentWhite(properties, currentYear);
   tractWhiteHouseholdsElt.innerHTML = 'White households: ' + getFormattedTractData(properties, TRACT_WHITE_HOUSEHOLDS_KEY);
   tractBlackHouseholdsElt.innerHTML = 'Black households: ' + getFormattedTractData(properties, TRACT_BLACK_HOUSEHOLDS_KEY);
   tractAsianHouseholdsElt.innerHTML = 'Asian households: ' + getFormattedTractData(properties, TRACT_ASIAN_HOUSEHOLDS_KEY);
   tractOtherHouseholdsElt.innerHTML = 'Other households: ' + getFormattedTractData(properties, TRACT_OTHER_HOUSEHOLDS_KEY);
   tractTwoOrMoreRacesHouseholdsElt.innerHTML = 'Households w/ multiple races: ' + getFormattedTractData(properties, TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY);
   tractTotalHouseholdsElt.innerHTML = 'Total households: ' + getFormattedTractData(properties, TRACT_TOTAL_HOUSEHOLDS_KEY);
-  tractTotalHouseholdsMarginOfErrorElt.innerHTML = 'margin of error: ' + getFormattedTractData(properties, TRACT_TOTAL_HOUSEHOLDS_MARGIN_OF_ERROR_KEY);
+  tractTotalHouseholdsMarginOfErrorElt.innerHTML = 'margin of error: ' + getMarginOfError(properties, currentYear);
 }
 
 const emptyTractInfoBox = () => {
@@ -217,27 +260,17 @@ const handleCensusTractInfoLayerFeature = (feature, layer) => {
     })(layer, feature.properties);
 }
 
-const redrawRaceLayer = (previousYear, currentYear) => {
-  removeRaceLayer(previousYear);
-  addRaceLayer(currentYear);
-}
-
-const redrawIncomeLayer = (previousYear, currentYear) => {
-  removeIncomeLayer(previousYear);
-  addIncomeLayer(currentYear);
-}
-
-const redrawBikeStationLayer = (previousYear, currentYear) => {
-  removeBikeStationLayer(previousYear);
-  addBikeStationLayer(currentYear);
-}
-
 const makeCensusTractInfoLayer = () => {
   censusTractInfoLayerGroup = L
     .geoJson(censusTractDataGeojson, {
       onEachFeature: handleCensusTractInfoLayerFeature,
       style: censusTractFeatureStyleDefault,
     });  
+}
+
+const redrawCensusTractInfoLayer = () => {
+  map.removeLayer(censusTractInfoLayerGroup);
+  addCensusTractInfoLayer();
 }
 
 const addCensusTractInfoLayer = () => {
@@ -252,11 +285,10 @@ const removeRaceLayer = (year=currentYear) => {
 }
 
 const addRaceLayer = (year=currentYear) => {
-  console.log('addRaceLayer TODO!!')
   // Census data only goes up to 2017, so 2017 data used for years onward
   year = (year > 2017) ? 2017 : year;
   if (!raceLayerGroups[year])
-    raceLayerGroups[year] = L.geoJson(censusTractDataGeojson, {filter: () => false});//{style: raceStyle(year)});
+    raceLayerGroups[year] = L.geoJson(censusTractDataGeojson, {style: raceStyle(year)});
   raceLayerGroups[year].addTo(map);
 }
 
@@ -327,20 +359,7 @@ const selectYear = (year) => {
   let previousYear = currentYear;
   currentYear = year;
 
-  if (incomeCheck.checked)
-    redrawIncomeLayer(previousYear, currentYear);
-
-  if (raceCheck.checked)
-    redrawRaceLayer(previousYear, currentYear);
-
-  if (bikeCheck.checked)
-    redrawBikeStationLayer(previousYear, currentYear);
-
-  // Make the census tract info layer once (in setup)
-  // then make sure it is always on top
-  map.removeLayer(censusTractInfoLayerGroup);
-  addCensusTractInfoLayer();
-
+  redrawMapLayers(previousYear, currentYear);
 
   document.querySelectorAll('button').forEach((btn) => {
     btn.className = '';
@@ -354,33 +373,13 @@ const selectYear = (year) => {
 
 
 const toggleBikeStationLayer = () => {
-  if (bikeCheck.checked)
-    redrawBikeStationLayer(currentYear, currentYear);
-  else
-    removeBikeStationLayer(currentYear);
+  redrawMapLayers(currentYear, currentYear);
 }
-
-
 const toggleRaceLayer = () => {
-  if (raceCheck.checked) {
-    redrawRaceLayer(currentYear, currentYear);
-    // markers layer should be above income layer coloring -- so maybe show it
-    redrawBikeStationLayer(currentYear, currentYear);
-  }
-  else {
-    removeRaceLayer(currentYear);
-  }
+  redrawMapLayers(currentYear, currentYear);
 }
-
 const toggleIncomeLayer = () => {
-  if (incomeCheck.checked) {
-    redrawIncomeLayer(currentYear, currentYear);
-    // markers layer should be above income layer coloring -- so maybe show it
-    redrawBikeStationLayer(currentYear, currentYear);
-  }
-  else {
-    removeIncomeLayer(currentYear);
-  }
+  redrawMapLayers(currentYear, currentYear);
 }
 
 

@@ -10,46 +10,76 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
   </head>
   <body>
-    <div id="tract-info-container">
-      <div id="year"></div>
-      <div id="city">New York City</div>
-      <div id="tract-info">
-        <p id="tract-name"></p>
-        <!-- TODO: note margin of error -->
-        <p id="tract-median-income"></p>
-        <p style="display: none;" id="tract-percent-white"></p>
-        <p id="tract-white-households"></p>
-        <p id="tract-black-households"></p>
-        <p id="tract-asian-households"></p>
-        <p id="tract-other-households"></p>
-        <p id="tract-two-or-more-races-households"></p>
-        <p id="tract-total-households"></p>
-        <p id="tract-total-households-margin-of-error"></p>
+    <div id="text-container">
+      <div id="tract-info-container">
+        <div id="year"></div>
+        <div id="city">New York City</div>
+        <div id="tract-info">
+          <p id="tract-name"></p>
+          <!-- TODO: note margin of error -->
+          <p id="tract-median-income"></p>
+          <p style="display: none;" id="tract-percent-white"></p>
+          <p id="tract-white-households"></p>
+          <p id="tract-black-households"></p>
+          <p id="tract-asian-households"></p>
+          <p id="tract-other-households"></p>
+          <p id="tract-two-or-more-races-households"></p>
+          <p id="tract-total-households"></p>
+          <p id="tract-total-households-margin-of-error"></p>
+        </div>
+      </div>
+      <div class="year-selector">
+        <p>Select Year</p>
+        <div id="year-buttons">
+        <button id="b-2013" onclick="selectYear('2013')">2013</button>
+        <button id="b-2014" onclick="selectYear('2014')">2014</button>
+        <button id="b-2015" onclick="selectYear('2015')">2015</button>
+        <button id="b-2016" onclick="selectYear('2016')">2016</button>
+        <button id="b-2017" onclick="selectYear('2017')">2017</button>
+        <button id="b-2018" onclick="selectYear('2018')">2018</button>
+        <button id="b-2019" onclick="selectYear('2019')">2019</button>
+        </div>
+      </div>
+      <div id="data-selector">
+
+        <div class="show-data-check">
+          <label class="checkbox-container">
+            Show income
+            <input type="checkbox" id="b-income" checked />
+            <span class="checkmark"></span>
+          </label>
+          <div id="income-legend">
+            <span class="legend-end-num">$0</span>
+            <div class="legend-bar" id="income-legend-bar"></div>
+            <span class="legend-end-num">$250,000+</span>
+          </div>
+        </div>
+          <div class="show-data-check">
+          <label class="checkbox-container">
+            Show race
+            <input type="checkbox" id="b-race" checked />
+            <span class="checkmark"></span>
+          </label>
+          <div id="race-legend">
+            <span class="legend-end-num">0%</span>
+            <div class="legend-bar" id="race-legend-bar"></div>
+            <span class="legend-end-num">100%</span>
+          </div>
+        </div>
+
+        <div class="show-data-check">
+          <label class="checkbox-container">
+            Show docks
+            <input type="checkbox" id="b-bikes" checked />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+
       </div>
     </div>
     <div id="map" class="map"></div>
-    <div class="year-selector">
-      <button id="b-2013" onclick="selectYear('2013')">2013</button>
-      <button id="b-2014" onclick="selectYear('2014')">2014</button>
-      <button id="b-2015" onclick="selectYear('2015')">2015</button>
-      <button id="b-2016" onclick="selectYear('2016')">2016</button>
-      <button id="b-2017" onclick="selectYear('2017')">2017</button>
-      <button id="b-2018" onclick="selectYear('2018')">2018</button>
-      <button id="b-2019" onclick="selectYear('2019')">2019</button>
-      <label class="check">
-        Show docks
-        <input type="checkbox" id="b-bikes" checked />
-      </label>
-      <label class="check">
-        Show income
-        <input type="checkbox" id="b-income" checked />
-      </label>
-      <label class="check">
-        Show race
-        <input type="checkbox" id="b-race" checked />
-      </label>
-    </div>
     <script src="./viz/nyc-stations.js"></script>
     <script src="./viz/median-income.js"></script>
+    <script src="./viz/map.js"></script>
   </body>
 </html>
