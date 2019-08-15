@@ -137,9 +137,6 @@ body {
   left: 5px;
 }
 
-#income-legend {
-
-}
 #income-legend-bar {
     background: -webkit-linear-gradient(90deg, rgba(255, 245, 64, .2), rgba(73, 143, 54, .9)); /* For Safari 5.1 to 6.0 */
     background: -o-linear-gradient(90deg, rgba(255, 245, 64, .2), rgba(73, 143, 54, .9)); /* For Opera 11.1 to 12.0 */
@@ -156,6 +153,7 @@ body {
 
     background-color: white;
 }
+
 .legend-bar {
     width: 100px;
     height: 20px;
@@ -166,7 +164,9 @@ body {
     font-size: 13px;
     vertical-align: text-top;
 }
-
+#race-legend-explain {
+    font-size: 0.8em;
+}
 
 
 /*
