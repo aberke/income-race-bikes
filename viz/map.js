@@ -87,9 +87,9 @@ const redrawMapLayers = (previousYear=currentYear, year=currentYear, options) =>
 	// then make sure it is always on top (but below bikes)
 	redrawCensusTractInfoLayer();
 
-	removeBikeStationLayer(year);
+	removeBikeStationLayer(previousYear);
 	if (bikeCheck.checked)
-		addBikeStationLayer(previousYear, year);
+		addBikeStationLayer(year);
 }
 
 const censusTractFeatureStyleHighlight = {
@@ -140,6 +140,7 @@ const addCensusTractInfoLayer = () => {
 }
 
 const removeRaceLayer = (year=currentYear) => {
+  year = (year > 2017) ? 2017 : year;
   if (!!raceLayerGroups[year] && map.hasLayer(raceLayerGroups[year]))
     map.removeLayer(raceLayerGroups[year]);
 }
@@ -149,10 +150,12 @@ const addRaceLayer = (year=currentYear) => {
   year = (year > 2017) ? 2017 : year;
   if (!raceLayerGroups[year])
     raceLayerGroups[year] = L.geoJson(censusTractDataGeojson, {style: raceStyle(year)});
-  raceLayerGroups[year].addTo(map);
+  // raceLayerGroups[year].addTo(map);
+  map.addLayer(raceLayerGroups[year]);
 }
 
 const removeIncomeLayer = (year=currentYear) => {
+  year = (year > 2017) ? 2017 : year;
   if (!!incomeLayerGroups[year] && map.hasLayer(incomeLayerGroups[year]))
     map.removeLayer(incomeLayerGroups[year]);
 }
@@ -162,12 +165,13 @@ const addIncomeLayer = (year=currentYear) => {
   year = (year > 2017) ? 2017 : year;
   if (!incomeLayerGroups[year])
     incomeLayerGroups[year] = L.geoJson(censusTractDataGeojson, {style: incomeStyle(year)});
-  incomeLayerGroups[year].addTo(map);
+  map.addLayer(incomeLayerGroups[year]);
 }
 
 const removeBikeStationLayer = (year=currentYear) => {
-  if (!!bikeStationMarkerLayerGroups[year] && map.hasLayer(bikeStationMarkerLayerGroups[year]))
+  if (!!bikeStationMarkerLayerGroups[year] && map.hasLayer(bikeStationMarkerLayerGroups[year])) {
     map.removeLayer(bikeStationMarkerLayerGroups[year]);
+  }
 }
 
 const addBikeStationLayer = (year=currentYear) => {
@@ -229,7 +233,7 @@ const highIncomeColorRange = d3
 const incomeStyle = (year) => (feature) => {
   // Each feature is a geoJSON object with information for each year.
   // Returns style based on year of interest.
-  let income = getTractData(feature.properties, TRACT_MEDIAN_INCOME_KEY);
+  let income = getTractData(feature.properties, TRACT_MEDIAN_INCOME_KEY, year);
   if (income === '250,000+') {
     income = 300000;
   }
