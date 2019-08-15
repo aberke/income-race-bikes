@@ -19,14 +19,18 @@ let currentOptions;
 const INITIAL_ZOOM_LEVEL = 12;
 const MAX_ZOOM_LEVEL = 18;
 
+const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242];  // Location: The Recurse Center
+const MAP_START_VIEW_CENTER_BOSTON = [42.360406,-71.0601817];
 
-const setupMap = () => {
+
+const setupMap = (city) => {
+  let mapStartViewCenter = (city == 'boston') ? MAP_START_VIEW_CENTER_BOSTON : MAP_START_VIEW_CENTER_NYC;
 	map = L
     .map('map', {
       preferCanvas: true,
       zoomControl:false,
     })
-    .setView([40.691425, -73.987242], INITIAL_ZOOM_LEVEL);
+    .setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
 
   L.tileLayer(MAPBOX_URL, {
       maxZoom: MAX_ZOOM_LEVEL,

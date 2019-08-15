@@ -1,11 +1,6 @@
 /* DOM and things */
 
 
-const setup = function() {
-  setupMap();
-  selectYear(2013);
-}
-
 // Set up station years as an object mapping 
 // {(int)first year for station: [list of station ids]}
 const stationYears = stationsJson.reduce((obj, station) => {
@@ -155,11 +150,29 @@ const setupFromURLParams = () => {
   if (b == null)
     bikeCheck.checked = true;
 
-  // if (!city || !cityData[city])
-  //   city = 'nyc';  // Default to this amazing place
+  // TODO
+  // if (!city) || !cityData[city])
+    // city = 'nyc';  // Default to this amazing place
   // stationsJson = cityData[city]['stations'];
   // censusTractDataGeojson = cityData[city]['censusTractData'];
   // TODO: handle year
+
+
+  // load the data
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', './viz/nyc-census-tracts-data.geojson');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    if (xhr.status !== 200) {
+      console.error('loading geojson returned status code', xhr.status);
+      return;
+    }
+    censusTractDataGeojson = xhr.response;
+    setupMap((!!city) ? city : 'nyc');
+    selectYear((!!year) ? year : 2013);
+  };
+  xhr.send();
 }
 
 const updateURLParams = () => {
@@ -187,21 +200,6 @@ const updateURLParams = () => {
 }
 
 
-
-// load the data
-let xhr = new XMLHttpRequest();
-xhr.open('GET', './viz/nyc-census-tracts-data.geojson');
-xhr.setRequestHeader('Content-Type', 'application/json');
-xhr.responseType = 'json';
-xhr.onload = function() {
-  if (xhr.status !== 200) {
-    console.error('loading geojson returned status code', xhr.status);
-    return;
-  }
-  censusTractDataGeojson = xhr.response;
-  setup();
-};
-xhr.send();
 
 setupFromURLParams();
 
