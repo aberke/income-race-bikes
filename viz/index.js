@@ -101,12 +101,15 @@ const selectYear = (year) => {
 
 
 const toggleBikeStationLayer = () => {
+  updateURLParams();
   redrawMapLayers(currentYear, currentYear);
 }
 const toggleRaceLayer = () => {
+  updateURLParams();
   redrawMapLayers(currentYear, currentYear);
 }
 const toggleIncomeLayer = () => {
+  updateURLParams();
   redrawMapLayers(currentYear, currentYear);
 }
 
@@ -116,6 +119,73 @@ const raceCheck = document.getElementById('b-race');
 bikeCheck.addEventListener('click', toggleBikeStationLayer);
 incomeCheck.addEventListener('click', toggleIncomeLayer);
 raceCheck.addEventListener('click', toggleRaceLayer);
+
+// const cityData = {
+//   'nyc': {
+//     'stations': link to stations,
+//     'censusTractData': link to geojson
+//   },
+//   ...
+// }
+// Handle preselection of checks from URL
+// Because sticky parameters make for better sharing
+
+// http://URL/this-map-i-spent-too-much-time-on?c=city&y=year&r&i&b
+// where presence of r in dicates showRace is UNchecked
+// where presence of i in dicates showIncome is UNchecked
+
+const URL_PARAM_CITY = 'city';
+const URL_PARAM_YEAR = 'year';
+const URL_PARAM_INCOME = 'i';
+const URL_PARAM_RACE = 'r';
+const URL_PARAM_BIKES = 'b';
+
+const setupFromURLParams = () => {
+  const urlString = window.location.href;
+  let url = new URL(urlString);
+  let city = url.searchParams.get(URL_PARAM_CITY);
+  let year = url.searchParams.get(URL_PARAM_YEAR);
+  let i = url.searchParams.get(URL_PARAM_INCOME);
+  let r = url.searchParams.get(URL_PARAM_RACE);
+  let b = url.searchParams.get(URL_PARAM_BIKES);
+  if (i == null)
+    incomeCheck.checked = true;
+  if (r == null)
+    raceCheck.checked = true;
+  if (b == null)
+    bikeCheck.checked = true;
+
+  // if (!city || !cityData[city])
+  //   city = 'nyc';  // Default to this amazing place
+  // stationsJson = cityData[city]['stations'];
+  // censusTractDataGeojson = cityData[city]['censusTractData'];
+  // TODO: handle year
+}
+
+const updateURLParams = () => {
+  let urlString = window.location.href;
+  let url = new URL(urlString);
+  if (incomeCheck.checked)
+    url.searchParams.delete(URL_PARAM_INCOME)
+  else 
+    url.searchParams.set(URL_PARAM_INCOME, '');
+
+  if (raceCheck.checked)
+    url.searchParams.delete(URL_PARAM_RACE)
+  else 
+    url.searchParams.set(URL_PARAM_RACE, '');
+
+  if (bikeCheck.checked)
+    url.searchParams.delete(URL_PARAM_BIKES)
+  else 
+    url.searchParams.set(URL_PARAM_BIKES, '');
+
+  // TODO
+  // url.searchParams.set(URL_PARAM_YEAR, currentYear);
+
+  window.history.pushState('','',url.toString());
+}
+
 
 
 // load the data
@@ -132,4 +202,6 @@ xhr.onload = function() {
   setup();
 };
 xhr.send();
+
+setupFromURLParams();
 
