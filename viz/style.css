@@ -105,7 +105,9 @@ body {
   left: 0;
   height: 18px;
   width: 18px;
-  background-color: #eee;
+  background-color: black;
+  color: black;
+  font-weight: bold;
 }
 
 /* On mouse-over, add a grey background color */
@@ -115,7 +117,7 @@ body {
 
 /* When the checkbox is checked, add a blue background */
 .checkbox-container input:checked ~ .checkmark {
-  background-color: black;
+  background-color: white;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */
