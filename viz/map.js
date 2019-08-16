@@ -21,11 +21,18 @@ const MAX_ZOOM_LEVEL = 18;
 
 const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242];  // Location: The Recurse Center
 const MAP_START_VIEW_CENTER_BOSTON = [42.360406,-71.0601817];
-
+const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
 
 const setupMap = (city) => {
   let mapStartViewCenter = (city == 'boston') ? MAP_START_VIEW_CENTER_BOSTON : MAP_START_VIEW_CENTER_NYC;
-	map = L
+  if (city==='boston')
+    mapStartViewCenter = MAP_START_VIEW_CENTER_BOSTON;
+  else if (city==='philly')
+    mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
+  else
+    mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
+    
+  map = L
     .map('map', {
       preferCanvas: true,
       zoomControl:false,
