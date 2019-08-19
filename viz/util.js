@@ -1,6 +1,20 @@
 /* Utility and data things
 
 */
+
+// Transforms bike stations data into object mapping:
+// {(int)first year for station: [list of station ids]}
+const stationsByYearsMap = (stationsJson) => {
+  return stationsJson.reduce((obj, station) => {
+    const beginYear = parseInt(station.first.split('-')[0]);
+    return {
+      ...obj,
+      [beginYear]: [...(obj[beginYear] || []), station],
+    };
+  }, {});
+}
+
+
 const getTractData = (properties, key, year=currentYear) => {
   // The data should be a number
   return properties[year + ' ' + key];

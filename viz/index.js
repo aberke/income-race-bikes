@@ -1,18 +1,5 @@
 /* DOM and things */
 
-
-// Set up station years as an object mapping 
-// {(int)first year for station: [list of station ids]}
-const stationYears = stationsJson.reduce((obj, station) => {
-  const beginYear = parseInt(station.first.split('-')[0]);
-  return {
-    ...obj,
-    [beginYear]: [...(obj[beginYear] || []), station],
-  };
-}, {});
-
-
-
 // Using constants for property keys from the geojson to allow compression (TODO)
 NYC_TRACT_NAME_KEY = 'Neighborhood';
 

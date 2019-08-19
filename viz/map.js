@@ -3,6 +3,7 @@
 */
 const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 
+let stationYears;
 let censusTractDataGeojson;
 
 let map;
@@ -25,12 +26,17 @@ const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
 
 const setupMap = (city) => {
   let mapStartViewCenter = (city == 'boston') ? MAP_START_VIEW_CENTER_BOSTON : MAP_START_VIEW_CENTER_NYC;
-  if (city==='boston')
+  if (city==='boston') {
     mapStartViewCenter = MAP_START_VIEW_CENTER_BOSTON;
-  else if (city==='philly')
+    stationYears = stationsByYearsMap(bostonStationsJson);
+  } else if (city==='philly') {
     mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
-  else
+    // TODO:
+    // stationYears = stationsByYearsMap(phillyStationsJson);
+  } else {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
+    stationYears = stationsByYearsMap(nycStationsJson);
+  }
     
   map = L
     .map('map', {
