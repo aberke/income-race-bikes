@@ -26,9 +26,11 @@ const tractOtherHouseholdsElt = document.getElementById('tract-other-households'
 const tractTwoOrMoreRacesHouseholdsElt = document.getElementById('tract-two-or-more-races-households');
 const tractTotalHouseholdsElt = document.getElementById('tract-total-households');
 const tractTotalHouseholdsMarginOfErrorElt = document.getElementById('tract-total-households-margin-of-error');
+const hoverForInfoElt = document.getElementById('hover-over-the-map');
 
 
 const fillTractInfoBox = (properties) => {
+  hoverForInfoElt.style.display = "none";
   tractNameElt.innerHTML = properties[TRACT_NAME_KEY] || properties[NYC_TRACT_NAME_KEY];
   tractMedianIncomeElt.innerHTML = 'Median income: ' + getFormattedMedianIncome(properties, currentYear);
   tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getFormattedPercentWhite(properties, currentYear);
@@ -52,6 +54,7 @@ const emptyTractInfoBox = () => {
   tractTwoOrMoreRacesHouseholdsElt.innerHTML = '';
   tractTotalHouseholdsElt.innerHTML = '';
   tractTotalHouseholdsMarginOfErrorElt.innerHTML = '';
+  hoverForInfoElt.style.display = "block";
 }
 
 

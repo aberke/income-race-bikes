@@ -65,6 +65,11 @@ body {
 #tract-info-container {
     height: 280px;
 }
+#tract-info-container p#hover-over-the-map {
+  font-size: 1.1em;
+  font-style: italic;
+}
+
 #year {
     font-size: 36px;
 }
