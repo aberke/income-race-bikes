@@ -10,10 +10,14 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
   </head>
   <body>
+    <div id="loading-container">
+      <img height="250px" src="./viz/loading.gif">
+      <p>Loading data...</p>
+    </div>
     <div id="text-container">
       <div id="tract-info-container">
         <div id="year"></div>
-        <div id="city">New York City</div>
+        <div id="city"></div>
         <div id="tract-info">
           <p id="tract-name"></p>
           <!-- TODO: note margin of error -->
@@ -30,14 +34,8 @@
       </div>
       <div class="year-selector">
         <p>Select Year</p>
-        <div id="year-buttons">
-        <button id="b-2013" onclick="selectYear('2013')">2013</button>
-        <button id="b-2014" onclick="selectYear('2014')">2014</button>
-        <button id="b-2015" onclick="selectYear('2015')">2015</button>
-        <button id="b-2016" onclick="selectYear('2016')">2016</button>
-        <button id="b-2017" onclick="selectYear('2017')">2017</button>
-        <button id="b-2018" onclick="selectYear('2018')">2018</button>
-        <button id="b-2019" onclick="selectYear('2019')">2019</button>
+        <div id="year-buttons-container">
+          <!-- this container is filled with buttons via javascript -->
         </div>
       </div>
       <div id="data-selector">

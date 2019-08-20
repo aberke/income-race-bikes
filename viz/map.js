@@ -3,6 +3,14 @@
 */
 const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 
+const NYC_BIKE_DATA_URL = './data/nyc-bike/stations.json';
+const BOSTON_BIKE_DATA_URL = './data/boston-bike/stations.json';
+const PHILLY_BIKE_DATA_URL = 'TODO';
+
+const NYC_CENSUS_DATA_URL = './data/ny/nyc_census_tracts.geojson';
+const BOSTON_CENSUS_DATA_URL = './data/ma/ma_census_tracts.geojson';
+const PHILLY_CENSUS_DATA_URL = 'TODO';
+
 let stationYears;
 let censusTractDataGeojson;
 
@@ -24,19 +32,46 @@ const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242];  // Location: The Rec
 const MAP_START_VIEW_CENTER_BOSTON = [42.360406,-71.0601817];
 const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
 
-const setupMap = (city) => {
-  let mapStartViewCenter = (city == 'boston') ? MAP_START_VIEW_CENTER_BOSTON : MAP_START_VIEW_CENTER_NYC;
+
+const setupMap = (city, year) => {
+  // Order of things:
+  // (loading screen is being shown)
+  // position map
+  // load bikes json data & do setup from bikes data (years, stationsMap)
+  // load census data
+  // draw layers
+  // hide loading screen
+
+  let mapStartViewCenter, bikeDataURL, censusDataURL;
+
   if (city==='boston') {
     mapStartViewCenter = MAP_START_VIEW_CENTER_BOSTON;
-    stationYears = stationsByYearsMap(bostonStationsJson);
+    bikeDataURL = BOSTON_BIKE_DATA_URL;
+    censusDataURL = BOSTON_CENSUS_DATA_URL;
   } else if (city==='philly') {
     mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
-    // TODO:
-    // stationYears = stationsByYearsMap(phillyStationsJson);
+    bikeDataURL = PHILLY_BIKE_DATA_URL;
+    censusDataURL = PHILLY_CENSUS_DATA_URL;
   } else {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
-    stationYears = stationsByYearsMap(nycStationsJson);
+    bikeDataURL = NYC_BIKE_DATA_URL;
+    censusDataURL = NYC_CENSUS_DATA_URL;
   }
+
+  // load bike station data
+  loadJsonData(bikeDataURL, function(bikeData) {
+    stationYears = stationsByYearsMap(bikeData);
+    let years = Object.keys(stationYears);
+    setupYearButtons(years);
+    // load census data
+    loadJsonData(censusDataURL, function(censusData) {
+      censusTractDataGeojson = censusData;
+      addCensusTractInfoLayer();
+      selectYear((!!year) ? year : years[0]);
+      hideLoadingScreen();
+    });
+  });
+
     
   map = L
     .map('map', {
@@ -71,8 +106,6 @@ const setupMap = (city) => {
       }
     }
   });
-
-  addCensusTractInfoLayer();
 }
 
 
@@ -195,7 +228,8 @@ const addBikeStationLayer = (year=currentYear) => {
 
 const createBikeStationLayerGroup = (year) => {
   let bikeStationMarkerLayerGroup = L.layerGroup();
-  for (let i = 2013; i < (currentYear + 1); i++) {
+  let firstYear = Object.keys(stationYears)[0];
+  for (let i = firstYear; i < (currentYear + 1); i++) {
     const stations = stationYears[i] || [];
     stations.forEach((station) => {
       if (station.last < currentYear) {

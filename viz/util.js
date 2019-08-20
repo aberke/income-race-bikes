@@ -2,6 +2,24 @@
 
 */
 
+
+const loadJsonData = (dataURL, callback) => {
+  // vanilla javascript data getter
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', dataURL);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    if (xhr.status !== 200) {
+      console.error('loading json data returned status code', xhr.status, dataURL);
+      return;
+    }
+    callback(xhr.response);
+  };
+  xhr.send(); 
+}
+
+
 // Transforms bike stations data into object mapping:
 // {(int)first year for station: [list of station ids]}
 const stationsByYearsMap = (stationsJson) => {

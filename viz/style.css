@@ -5,15 +5,29 @@ body {
     margin: 0px;
 }
 
+#loading-container {
+  position: fixed;
+  z-index: 2000;
+  width: 100%;
+  top: 50px;
+  padding: 50px;
+}
+#loading-container img {
+  margin: auto;
+  display: block;
+}
+#loading-container p {
+  text-align: center;
+  color: darkslategray;
+  font-size: 3em;
+}
+
 #map {
     width: 100vw;
     height: 100vh;
 }
 
-.year-selector {
-    
-}
-.year-selector button{
+.year-selector button {
     font-family: 'Helvetica', arial, sans-serif;
     font-size: 16px;
     border: 0px;
