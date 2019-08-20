@@ -67,7 +67,10 @@ const setupMap = (city, year) => {
     loadJsonData(censusDataURL, function(censusData) {
       censusTractDataGeojson = censusData;
       addCensusTractInfoLayer();
-      selectYear((!!year) ? year : years[0]);
+      // set up data viz - with okay year
+      if (!year || (years.indexOf(year) < 0))
+        year = years[0];
+      selectYear(year);
       hideLoadingScreen();
     });
   });

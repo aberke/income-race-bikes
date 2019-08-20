@@ -86,6 +86,8 @@ const setupYearButtons = (yearsList) => {
 }
 
 
+
+
 const selectYear = (year) => {
   year = parseInt(year);
   if (year == currentYear) {
@@ -94,7 +96,11 @@ const selectYear = (year) => {
   let previousYear = currentYear;
   currentYear = year;
   redrawMapLayers(previousYear, currentYear);
+  updateYearHTML(year);
+  updateURLParams();
+};
 
+const updateYearHTML = (year) => {
   document.querySelectorAll('button').forEach((btn) => {
     btn.className = '';
     if (btn.id === 'year-button-' + year.toString()) {
@@ -102,7 +108,7 @@ const selectYear = (year) => {
     }
   });
   yearElt.innerHTML = year.toString();
-};
+}
 
 
 const toggleBikeStationLayer = () => {
@@ -131,14 +137,6 @@ const hideLoadingScreen = () => {
 }
 
 
-
-// const cityData = {
-//   'nyc': {
-//     'stations': link to stations,
-//     'censusTractData': link to geojson
-//   },
-//   ...
-// }
 // Handle preselection of checks from URL
 // Because sticky parameters make for better sharing
 
@@ -166,16 +164,9 @@ const setupFromURLParams = () => {
     raceCheck.checked = true;
   if (b == null)
     bikeCheck.checked = true;
-
-  // TODO
-  // if (!city) || !cityData[city])
-    // city = 'nyc';  // Default to this amazing place
-  // stationsJson = cityData[city]['stations'];
-  // censusTractDataGeojson = cityData[city]['censusTractData'];
-  // TODO: handle year
-
+  updateYearHTML(year || '');
   setupCityHTML(city);
-  setupMap(city);
+  setupMap(city, year);
 }
 
 const updateURLParams = () => {
@@ -196,8 +187,7 @@ const updateURLParams = () => {
   else 
     url.searchParams.set(URL_PARAM_BIKES, '');
 
-  // TODO
-  // url.searchParams.set(URL_PARAM_YEAR, currentYear);
+  url.searchParams.set(URL_PARAM_YEAR, currentYear);
 
   window.history.pushState('','',url.toString());
 }
