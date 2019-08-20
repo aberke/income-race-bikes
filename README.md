@@ -13,18 +13,19 @@ Who decides where the bike share stations are located?  Are these decisions equi
 
 
 
-
 ## Data
 
 
 ### Census Data
 
 
-##### About the Data
+Income and race data is provided for each year by census tract.  It is from the [American Community Survey (5-year)](https://www.census.gov/programs-surveys/acs/guidance/estimates.html), which provides yearly population estimates.
 
-Data is from the 
+The data used for this map is household median income, and household race.
+*Race is displayed on the map as “Percent White”, which is calculated as the percentage of households that report “white only” in a given census tract.
 
-Race and Income data is 
+As of August 2019, this race and income data is [only available up to 2017](https://www.census.gov/programs-surveys/acs/news/data-releases/2018/release.html), so the map shows the same 2017 data for years 2018 and 2019.
+Margins of error are not shown on the map, but are available with all of the processed data here.
 
 
 ##### Obtaining and processing the Census Data
@@ -68,13 +69,10 @@ For state census data:
 
 
 
-
-
-
 ### Bike Station Data
 
 
-Bike trips data is scraped (see scripts).
+Bike trips data is scraped (see /scripts).
 - NYC: https://s3.amazonaws.com/tripdata/index.html
 - Boston: https://s3.amazonaws.com/hubway-data/index.html
 
