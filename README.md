@@ -1,8 +1,19 @@
 # Income, Race, Bikes
 
+https://aberke.github.io/income-race-bikes/
 
-Question:
-Who decides where the bike share stations are located?  Are these decisions equitable?
+### Is the placement of bikeshare docks equitable?
+
+The map explores this question visually.
+
+It displays the progressive placement of bikeshare docking stations over time, along with the race and median income of residents in the areas they serve.
+
+The map shows the addition of the docks, as well as the changes in income and race throughout the years the bikeshare program has been in service.  You can toggle the display to see only income, or race, or bikes data, or any of their combinations.
+
+
+#### Contributions
+
+Contributions are welcome and encouraged, whether they are for the UI, or city data!  If you would like to update city data, or add a city to the map, the process is described below.  Submit a pull request or email me if you have questions.
 
 
 ### Running Visualization Locally
