@@ -68,6 +68,7 @@ body {
     padding: 15px;
     width: 220px;
     overflow-y: scroll;
+    min-height: 100%;
 }
 #tract-info-container {
     min-height: 260px;
@@ -197,6 +198,10 @@ body {
     font-size: 0.8em;
 }
 
+#choose-city {
+  margin-top: 40px;
+}
+
 #about-container-wrapper {
   min-height: 300px;
   background-color: white;
@@ -211,16 +216,16 @@ body {
   max-width: 600px;
 }
 
+#about {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 #about-container h1,
 #about-container h2 {
   margin: 0;
   font-weight: 300;
-}
-
-#about-container .arrow {
-  margin: 0 15px;
-  font-size: 24px;
-  display: none;
 }
 
 #placement-question {
