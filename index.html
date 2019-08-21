@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
 
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+
     <script src="https://d3js.org/d3.v5.min.js"></script>
   </head>
   <body>
@@ -23,19 +25,19 @@
           <!-- TODO: note margin of error -->
           <p id="tract-median-income"></p>
           <p style="display: none;" id="tract-percent-white"></p>
-          <p id="tract-white-households"></p>
-          <p id="tract-black-households"></p>
-          <p id="tract-asian-households"></p>
-          <p id="tract-other-households"></p>
-          <p id="tract-two-or-more-races-households"></p>
           <p id="tract-total-households"></p>
-          <p id="tract-total-households-margin-of-error"></p>
+          <p class="detail" id="tract-white-households"></p>
+          <p class="detail" id="tract-black-households"></p>
+          <p class="detail" id="tract-asian-households"></p>
+          <p class="detail" id="tract-other-households"></p>
+          <p class="detail" id="tract-two-or-more-races-households"></p>
+          <p class="detail" id="tract-total-households-margin-of-error"></p>
 
           <p id="hover-over-the-map">Hover over neighborhoods for income and race numbers.</p>
         </div>
       </div>
       <div class="year-selector">
-        <p>Select Year</p>
+        <p id="select-year-copy">Select Year</p>
         <div id="year-buttons-container">
           <!-- this container is filled with buttons via javascript -->
         </div>
@@ -79,6 +81,58 @@
       </div>
     </div>
     <div id="map" class="map"></div>
+    <div id="about-container-wrapper">
+      <div id="about-container">
+        <h1><span class="arrow">&#8595</span> About <span class="arrow">&#8595</span></h1>
+
+        <p id="placement-question">Is the placement of bikeshare docks equitable?</p>
+        <p>The map explores this question visually.</p>
+
+
+        <p>It displays the progressive placement of bikeshare docking stations over time, along with the race and median income of residents in the areas they serve.</p>
+
+        <p>The map shows the addition of the docks, as well as the changes in income and race throughout the years the bikeshare program has been in service.  You can toggle the display to see only income, or race, or bikes data, or any of their combinations.</p>
+
+        <br/>
+
+        <h2>About The Data</h2>
+        <p><strong>Income and race data</strong> is provided for each year by census tract.  It is from the <a href="https://www.census.gov/programs-surveys/acs/guidance/estimates.html">American Community Survey (5-year)</a>, which provides yearly population estimates.
+
+        <p>The data used for this map is household median income, and household race.
+        <br/>*Race is displayed on the map as “Percent White”, which is calculated as the percentage of households that report “white only” in a given census tract.</p>
+
+        <p>As of August 2019, this race and income data is <a href="https://www.census.gov/programs-surveys/acs/news/data-releases/2018/release.html">only available up to 2017</a>, so the map shows the same 2017 data for years 2018 and 2019.
+        <br/>Margins of error and all of the processed data is available <a href="https://github.com/aberke/income-race-bikes/tree/master/data">here.</a></p>
+
+        <br/>
+        <p><strong>Bike station location data</strong> is scraped from the bikeshare company’s websites and is recent up to August 2019 (time of creation).</p>
+
+        <p>For more about the data scraping and processing, see <a href="https://github.com/aberke/income-race-bikes">code and documentation.</a></p>
+
+        <br/>
+        <hr/>
+        <br/>
+
+        <p>The question of who bikeshare systems serve and have the potential to better serve has been asked and answered before.</p>
+
+        <p>For example, <a href="https://issuu.com/nycommunities4change/docs/final_citi_bike_report">a 2019 report</a> found that New York’s Citi Bike system disproportionately serves New Yorkers of higher incomes and those who already have access to other transit options, and disproportionately serves few New Yorkers of color.
+        <br/>It reports a median household income of $90,400 in service areas versus $54,700 outside service areas.  It also found that the Citi Bike service area was “twice as white” as the rest of the area. </p>
+
+        <p>Yet U.S. studies have shown that people of color and people from the lowest-income households are in fact most likely to ride bicycles (<a href="https://peopleforbikes.org/blog/assumption-busters-surprising-facts-about-ethnicity-race-income-bicycles/">link to sources</a>).</p>
+
+        <p>This map explores data throughout the bikeshare program years of service because while equitable placement of docks may be improving, future systems can aim to avoid patterns of servicing privileged neighborhoods first.</p>
+
+        <br/>
+        <br/>
+        <hr/>
+        <br/>
+        <p>All code, data, and data processing scripts for this project are open-source: <a href="https://github.com/aberke/income-race-bikes">https://github.com/aberke/income-race-bikes</a>
+        <br/>
+        <br/><span style="font-style: italic;">Contributions welcomed.</span></p>
+
+
+      </div>
+    </div>
     <script src="./viz/util.js"></script>
     <script src="./viz/map.js"></script>
     <script src="./viz/index.js"></script>

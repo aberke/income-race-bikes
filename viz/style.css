@@ -24,7 +24,16 @@ body {
 
 #map {
     width: 100vw;
-    height: 100vh;
+    height: 88vh;
+}
+
+.year-selector {
+  width: 150px;
+}
+
+#select-year-copy {
+  float: right;
+  padding-top: 50px;
 }
 
 .year-selector button {
@@ -34,47 +43,44 @@ body {
     padding: 3px 5px;
     cursor: pointer;
     display: block;
-    background-color: black;
-    color: white;
-    margin: 1px;
+    background-color: white;
+    color: black;
+    margin: 0;
+    width: 45px;
+    border: 1px solid black;
 }
 
 .year-selector button:hover, .year-selector button.active {
-    background: gray;
-    color: black;
+    background: lightgray;
+    color: white;
 }
 .year-selector button.active {
-    background: white;
+    background: black;
 }
 
 #text-container {
     z-index: 2000;
-    background-color: rgba(0,0,0,0.7);
-    border: 1px solid gray;
-    border-left: 0;
-    border-top: 0;
-    color: white;
-    position: fixed;
+    background-color: rgb(255,255,255,0.6);
+    color: black;
+    position: absolute;
     top: 0px;
     left: 0px;
-    bottom: 0;
     padding: 15px;
     width: 220px;
     overflow-y: scroll;
 }
 #tract-info-container {
-    height: 280px;
+    min-height: 260px;
 }
 #tract-info-container p#hover-over-the-map {
-  font-size: 1.1em;
+  font-size: 1em;
   font-style: italic;
 }
 
 #year {
-    font-size: 36px;
+    font-size: 24px;
 }
 #city {
-    font-weight: bold;
 }
 
 #tract-info #tract-name {
@@ -89,6 +95,9 @@ body {
 #tract-info p {
     margin: 3px 0;
     font-size: 0.85em;
+}
+#tract-info p.detail {
+  margin-left: 25px;
 }
 
 .show-data-check {
@@ -124,9 +133,10 @@ body {
   left: 0;
   height: 18px;
   width: 18px;
-  background-color: black;
   color: black;
   font-weight: bold;
+  background: white;
+  border: 1px solid black;
 }
 
 /* On mouse-over, add a grey background color */
@@ -185,6 +195,36 @@ body {
 }
 #race-legend-explain {
     font-size: 0.8em;
+}
+
+#about-container-wrapper {
+  min-height: 300px;
+  background-color: white;
+  width: 100%;
+  top: 92vh;
+  z-index: 1000;
+  position: static;
+}
+#about-container {
+  margin-left: 300px;
+  padding:  15px;
+  max-width: 600px;
+}
+
+#about-container h1,
+#about-container h2 {
+  margin: 0;
+  font-weight: 300;
+}
+
+#about-container .arrow {
+  margin: 0 15px;
+  font-size: 24px;
+  display: none;
+}
+
+#placement-question {
+  font-style: italic;
 }
 
 

@@ -33,13 +33,13 @@ const fillTractInfoBox = (properties) => {
   hoverForInfoElt.style.display = "none";
   tractNameElt.innerHTML = properties[TRACT_NAME_KEY] || properties[NYC_TRACT_NAME_KEY];
   tractMedianIncomeElt.innerHTML = 'Median income: ' + getFormattedMedianIncome(properties, currentYear);
-  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getFormattedPercentWhite(properties, currentYear);
-  tractWhiteHouseholdsElt.innerHTML = 'White households: ' + getFormattedTractData(properties, TRACT_WHITE_HOUSEHOLDS_KEY);
-  tractBlackHouseholdsElt.innerHTML = 'Black households: ' + getFormattedTractData(properties, TRACT_BLACK_HOUSEHOLDS_KEY);
-  tractAsianHouseholdsElt.innerHTML = 'Asian households: ' + getFormattedTractData(properties, TRACT_ASIAN_HOUSEHOLDS_KEY);
-  tractOtherHouseholdsElt.innerHTML = 'Other households: ' + getFormattedTractData(properties, TRACT_OTHER_HOUSEHOLDS_KEY);
-  tractTwoOrMoreRacesHouseholdsElt.innerHTML = 'Households w/ multiple races: ' + getFormattedTractData(properties, TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY);
   tractTotalHouseholdsElt.innerHTML = 'Total households: ' + getFormattedTractData(properties, TRACT_TOTAL_HOUSEHOLDS_KEY);
+  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getFormattedPercentWhite(properties, currentYear);
+  tractWhiteHouseholdsElt.innerHTML = 'White: ' + getFormattedTractData(properties, TRACT_WHITE_HOUSEHOLDS_KEY);
+  tractBlackHouseholdsElt.innerHTML = 'Black: ' + getFormattedTractData(properties, TRACT_BLACK_HOUSEHOLDS_KEY);
+  tractAsianHouseholdsElt.innerHTML = 'Asian: ' + getFormattedTractData(properties, TRACT_ASIAN_HOUSEHOLDS_KEY);
+  tractOtherHouseholdsElt.innerHTML = 'Other: ' + getFormattedTractData(properties, TRACT_OTHER_HOUSEHOLDS_KEY);
+  tractTwoOrMoreRacesHouseholdsElt.innerHTML = 'Multiple races: ' + getFormattedTractData(properties, TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY);
   tractTotalHouseholdsMarginOfErrorElt.innerHTML = 'margin of error: ' + getMarginOfError(properties, currentYear);
 }
 
