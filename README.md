@@ -1,5 +1,6 @@
 # Income, Race, Bikes
 
+https://aberke.github.io/income-race-bikes/
 
 ### Is the placement of bikeshare docks equitable?
 
