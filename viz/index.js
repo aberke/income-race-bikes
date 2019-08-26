@@ -79,6 +79,8 @@ const setupCityHTML = (city) => {
 
 const setupYearButtons = (yearsList) => {
   let yearSelector = document.getElementById('year-buttons-container');
+  // clear out old buttons
+  yearSelector.innerHTML = null;
   yearsList.forEach((year) => {
     let button = document.createElement('button');
     button.setAttribute('id', 'year-button-' + year.toString());
@@ -88,14 +90,10 @@ const setupYearButtons = (yearsList) => {
   });
 }
 
-
-
-
 const selectYear = (year) => {
   year = parseInt(year);
-  if (year == currentYear) {
+  if (year == currentYear && incomeLayerGroups.length)
     return;
-  }
   let previousYear = currentYear;
   currentYear = year;
   redrawMapLayers(previousYear, currentYear);
@@ -178,6 +176,16 @@ const setupFromURLParams = () => {
   let hideAbout = url.searchParams.get(URL_PARAM_HIDE_ABOUT);
   if (hideAbout != null) 
     document.body.classList.add('hide-about');
+}
+
+const updateCityURLParam = (city) => {
+  let urlString = window.location.href;
+  let url = new URL(urlString);
+  url.searchParams.set(URL_PARAM_CITY, city);
+  url.searchParams.delete(URL_PARAM_YEAR);
+  window.history.pushState('','',url.toString());
+  setupCityHTML(city);
+  setupMap(city);
 }
 
 const updateURLParams = () => {

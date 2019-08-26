@@ -18,12 +18,9 @@ let map;
 let censusTractInfoLayerGroup;
 
 // Create the layers from geojson features as they are needed and cache them for reuse
-let raceLayerGroups = {};
-let incomeLayerGroups = {};
-let bikeStationMarkerLayerGroups = {};
-let currentBikeStationMarkerLayerGroup;
+let raceLayerGroups, incomeLayerGroups, bikeStationMarkerLayerGroups;
+let mapboxTilesLayer;
 let currentYear;
-let currentOptions;
 
 const INITIAL_ZOOM_LEVEL = 12;
 const MAX_ZOOM_LEVEL = 18;
@@ -57,6 +54,48 @@ const setupMap = (city, year) => {
     bikeDataURL = NYC_BIKE_DATA_URL;
     censusDataURL = NYC_CENSUS_DATA_URL;
   }
+  // set these to null again in the case this is a redraw
+  censusTractInfoLayerGroup = null;
+  raceLayerGroups = {};
+  incomeLayerGroups = {};
+  bikeStationMarkerLayerGroups = {};
+
+
+  if (!map) {
+    map = L.map('map', {
+      preferCanvas: true,
+      zoomControl:false,
+    })
+    mapboxTilesLayer = L.tileLayer(MAPBOX_URL, {
+      maxZoom: MAX_ZOOM_LEVEL,
+      id: 'mapbox.streets',
+      accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
+    });
+    // set up listeners
+    map.on('zoomend', () => {
+      const currentZoom = map.getZoom();
+      // adjust the bike markers
+      let currentBikeStationMarkerLayerGroup = bikeStationMarkerLayerGroups[currentYear];
+      if (!!currentBikeStationMarkerLayerGroup && map.hasLayer(currentBikeStationMarkerLayerGroup)) {
+        if (currentZoom >= 14) {
+          currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
+            marker.setRadius(5);
+          });
+        } else {
+          currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
+            marker.setRadius(2);
+          });
+        }
+      }
+    });
+  }
+  // in case of reset of map, remove previous layers
+  map.eachLayer(function(layer){
+      map.removeLayer(layer);
+  });
+  map.addLayer(mapboxTilesLayer);
+  map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
+
 
   // load bike station data
   loadJsonData(bikeDataURL, function(bikeData) {
@@ -72,42 +111,10 @@ const setupMap = (city, year) => {
         year = years[0];
       selectYear(year);
       hideLoadingScreen();
+      // called again here as a hack: otherwise on resetups of map, the layers
+      // were not immediately redrawn
+      map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
     });
-  });
-
-    
-  map = L
-    .map('map', {
-      preferCanvas: true,
-      zoomControl:false,
-    })
-    .setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
-
-  L.tileLayer(MAPBOX_URL, {
-      maxZoom: MAX_ZOOM_LEVEL,
-      id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
-    })
-    .addTo(map);
-
-
-  // set up listeners
-  map.on('zoomend', () => {
-    const currentZoom = map.getZoom();
-
-    // adjust the bike markers
-    currentBikeStationMarkerLayerGroup = bikeStationMarkerLayerGroups[currentYear];
-    if (!!currentBikeStationMarkerLayerGroup && map.hasLayer(currentBikeStationMarkerLayerGroup)) {
-      if (currentZoom >= 14) {
-        currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
-          marker.setRadius(5);
-        });
-      } else {
-        currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
-          marker.setRadius(2);
-        });
-      }
-    }
   });
 }
 

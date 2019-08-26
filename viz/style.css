@@ -26,6 +26,7 @@ body {
     width: 100vw;
     height: 88vh;
 }
+
 /*when embedding, have the map take up all the space*/
 .hide-about #map {
   height: 100vh;
@@ -73,6 +74,11 @@ body {
     width: 220px;
     overflow-y: scroll;
     min-height: 100%;
+}
+.hide-about #text-container {
+  position: fixed;
+  bottom: 0;
+  min-height: unset;
 }
 #tract-info-container {
     min-height: 260px;
@@ -206,6 +212,10 @@ body {
   margin-top: 40px;
 }
 
+
+.hide-about #about-container-wrapper {
+  display: none;
+}
 #about-container-wrapper {
   min-height: 300px;
   background-color: white;
