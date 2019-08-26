@@ -26,7 +26,7 @@ const INITIAL_ZOOM_LEVEL = 12;
 const MAX_ZOOM_LEVEL = 18;
 
 const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242];  // Location: The Recurse Center
-const MAP_START_VIEW_CENTER_BOSTON = [42.360406,-71.0601817];
+const MAP_START_VIEW_CENTER_BOSTON = [42.3607572,-71.0993565];  // Location: MIT
 const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
 
 
@@ -100,7 +100,16 @@ const setupMap = (city, year) => {
   // load bike station data
   loadJsonData(bikeDataURL, function(bikeData) {
     stationYears = stationsByYearsMap(bikeData);
-    let years = Object.keys(stationYears);
+    // construct the list of years.  It is not necessarily the same as they keys of the stationYears object.
+    let yearKeys = Object.keys(stationYears);
+    let firstYear = parseInt(yearKeys[0]);
+    let lastYear = parseInt(yearKeys[yearKeys.length - 1]);
+    let years = [];
+    let year = firstYear;
+    while (year <= lastYear)  {
+      years.push(year);
+      year += 1;
+    }
     setupYearButtons(years);
     // load census data
     loadJsonData(censusDataURL, function(censusData) {
