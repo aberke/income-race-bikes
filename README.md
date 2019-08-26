@@ -2,6 +2,8 @@
 
 https://aberke.github.io/income-race-bikes/
 
+<img src="assets/boston-income-race.gif" alt="map preview" width="450"/>
+
 ### Is the placement of bikeshare docks equitable?
 
 The map explores this question visually.
