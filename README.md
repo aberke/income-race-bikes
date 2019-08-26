@@ -94,3 +94,7 @@ This data is used to find the first trip originating from each bike dock station
 - The data is then processed by the bikes data processing script.
 - The output is saved to both csv and json.  That json is then copied to /viz to be used in map.
 
+
+### Viz notes
+
+Can use URL parameter `?ha` to hide the about section and have the map take up the full height of the frame.  This is useful when embedding in an iframe.

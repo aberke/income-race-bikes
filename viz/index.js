@@ -153,9 +153,12 @@ const URL_PARAM_INCOME = 'i';
 const URL_PARAM_RACE = 'r';
 const URL_PARAM_BIKES = 'b';
 
+const URL_PARAM_HIDE_ABOUT = 'ha';
+
 const setupFromURLParams = () => {
   const urlString = window.location.href;
   let url = new URL(urlString);
+  // set up map info
   let city = url.searchParams.get(URL_PARAM_CITY) || 'nyc'; // default: NYC
   let year = url.searchParams.get(URL_PARAM_YEAR);
   let i = url.searchParams.get(URL_PARAM_INCOME);
@@ -170,6 +173,11 @@ const setupFromURLParams = () => {
   updateYearHTML(year || '');
   setupCityHTML(city);
   setupMap(city, year);
+
+  // set up map styling
+  let hideAbout = url.searchParams.get(URL_PARAM_HIDE_ABOUT);
+  if (hideAbout != null) 
+    document.body.classList.add('hide-about');
 }
 
 const updateURLParams = () => {

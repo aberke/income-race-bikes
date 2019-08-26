@@ -26,6 +26,10 @@ body {
     width: 100vw;
     height: 88vh;
 }
+/*when embedding, have the map take up all the space*/
+.hide-about #map {
+  height: 100vh;
+}
 
 .year-selector {
   width: 150px;
