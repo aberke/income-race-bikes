@@ -3,70 +3,128 @@
 */
 const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe8u9yjw32/tiles/256/{z}/{x}/{y}?access_token={accessToken}';
 
+const NYC_BIKE_DATA_URL = './data/nyc-bike/stations.json';
+const BOSTON_BIKE_DATA_URL = './data/boston-bike/stations.json';
+const PHILLY_BIKE_DATA_URL = 'TODO';
+
+const NYC_CENSUS_DATA_URL = './data/ny/nyc_census_tracts.geojson';
+const BOSTON_CENSUS_DATA_URL = './data/ma/ma_census_tracts.geojson';
+const PHILLY_CENSUS_DATA_URL = 'TODO';
+
+let stationYears;
 let censusTractDataGeojson;
 
 let map;
 let censusTractInfoLayerGroup;
 
 // Create the layers from geojson features as they are needed and cache them for reuse
-let raceLayerGroups = {};
-let incomeLayerGroups = {};
-let bikeStationMarkerLayerGroups = {};
-let currentBikeStationMarkerLayerGroup;
+let raceLayerGroups, incomeLayerGroups, bikeStationMarkerLayerGroups;
+let mapboxTilesLayer;
 let currentYear;
-let currentOptions;
 
 const INITIAL_ZOOM_LEVEL = 12;
 const MAX_ZOOM_LEVEL = 18;
 
 const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242];  // Location: The Recurse Center
-const MAP_START_VIEW_CENTER_BOSTON = [42.360406,-71.0601817];
+const MAP_START_VIEW_CENTER_BOSTON = [42.3607572,-71.0993565];  // Location: MIT
 const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
 
-const setupMap = (city) => {
-  let mapStartViewCenter = (city == 'boston') ? MAP_START_VIEW_CENTER_BOSTON : MAP_START_VIEW_CENTER_NYC;
-  if (city==='boston')
+
+const setupMap = (city, year) => {
+  // Order of things:
+  // (loading screen is being shown)
+  // position map
+  // load bikes json data & do setup from bikes data (years, stationsMap)
+  // load census data
+  // draw layers
+  // hide loading screen
+
+  let mapStartViewCenter, bikeDataURL, censusDataURL;
+
+  if (city==='boston') {
     mapStartViewCenter = MAP_START_VIEW_CENTER_BOSTON;
-  else if (city==='philly')
+    bikeDataURL = BOSTON_BIKE_DATA_URL;
+    censusDataURL = BOSTON_CENSUS_DATA_URL;
+  } else if (city==='philly') {
     mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
-  else
+    bikeDataURL = PHILLY_BIKE_DATA_URL;
+    censusDataURL = PHILLY_CENSUS_DATA_URL;
+  } else {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
-    
-  map = L
-    .map('map', {
+    bikeDataURL = NYC_BIKE_DATA_URL;
+    censusDataURL = NYC_CENSUS_DATA_URL;
+  }
+  // set these to null again in the case this is a redraw
+  censusTractInfoLayerGroup = null;
+  raceLayerGroups = {};
+  incomeLayerGroups = {};
+  bikeStationMarkerLayerGroups = {};
+
+
+  if (!map) {
+    map = L.map('map', {
       preferCanvas: true,
       zoomControl:false,
     })
-    .setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
-
-  L.tileLayer(MAPBOX_URL, {
+    mapboxTilesLayer = L.tileLayer(MAPBOX_URL, {
       maxZoom: MAX_ZOOM_LEVEL,
       id: 'mapbox.streets',
       accessToken: 'pk.eyJ1Ijoic3RlaWZpbmVvIiwiYSI6ImNqdnlhY2I1NjBkcmQ0OHMydjYwd2ltMzgifQ.ImDnbNXB_59ei8IVXCN_4g'
-    })
-    .addTo(map);
-
-
-  // set up listeners
-  map.on('zoomend', () => {
-    const currentZoom = map.getZoom();
-
-    // adjust the bike markers
-    currentBikeStationMarkerLayerGroup = bikeStationMarkerLayerGroups[currentYear];
-    if (!!currentBikeStationMarkerLayerGroup && map.hasLayer(currentBikeStationMarkerLayerGroup)) {
-      if (currentZoom >= 14) {
-        currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
-          marker.setRadius(5);
-        });
-      } else {
-        currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
-          marker.setRadius(2);
-        });
+    });
+    // set up listeners
+    map.on('zoomend', () => {
+      const currentZoom = map.getZoom();
+      // adjust the bike markers
+      let currentBikeStationMarkerLayerGroup = bikeStationMarkerLayerGroups[currentYear];
+      if (!!currentBikeStationMarkerLayerGroup && map.hasLayer(currentBikeStationMarkerLayerGroup)) {
+        if (currentZoom >= 14) {
+          currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
+            marker.setRadius(5);
+          });
+        } else {
+          currentBikeStationMarkerLayerGroup.eachLayer((marker) => {
+            marker.setRadius(2);
+          });
+        }
       }
-    }
+    });
+  }
+  // in case of reset of map, remove previous layers
+  map.eachLayer(function(layer){
+      map.removeLayer(layer);
   });
+  map.addLayer(mapboxTilesLayer);
+  map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
 
-  addCensusTractInfoLayer();
+
+  // load bike station data
+  loadJsonData(bikeDataURL, function(bikeData) {
+    stationYears = stationsByYearsMap(bikeData);
+    // construct the list of years.  It is not necessarily the same as they keys of the stationYears object.
+    let yearKeys = Object.keys(stationYears);
+    let firstYear = parseInt(yearKeys[0]);
+    let lastYear = parseInt(yearKeys[yearKeys.length - 1]);
+    let years = [];
+    let year = firstYear;
+    while (year <= lastYear)  {
+      years.push(year);
+      year += 1;
+    }
+    setupYearButtons(years);
+    // load census data
+    loadJsonData(censusDataURL, function(censusData) {
+      censusTractDataGeojson = censusData;
+      addCensusTractInfoLayer();
+      // set up data viz - with okay year
+      if (!year || (years.indexOf(year) < 0))
+        year = years[0];
+      selectYear(year);
+      hideLoadingScreen();
+      // called again here as a hack: otherwise on resetups of map, the layers
+      // were not immediately redrawn
+      map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
+    });
+  });
 }
 
 
@@ -189,7 +247,8 @@ const addBikeStationLayer = (year=currentYear) => {
 
 const createBikeStationLayerGroup = (year) => {
   let bikeStationMarkerLayerGroup = L.layerGroup();
-  for (let i = 2013; i < (currentYear + 1); i++) {
+  let firstYear = Object.keys(stationYears)[0];
+  for (let i = firstYear; i < (currentYear + 1); i++) {
     const stations = stationYears[i] || [];
     stations.forEach((station) => {
       if (station.last < currentYear) {

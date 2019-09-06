@@ -1,7 +1,41 @@
 /* Utility and data things
 
 */
+
+
+const loadJsonData = (dataURL, callback) => {
+  // vanilla javascript data getter
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', dataURL);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.responseType = 'json';
+  xhr.onload = function() {
+    if (xhr.status !== 200) {
+      console.error('loading json data returned status code', xhr.status, dataURL);
+      return;
+    }
+    callback(xhr.response);
+  };
+  xhr.send(); 
+}
+
+
+// Transforms bike stations data into object mapping:
+// {(int)first year for station: [list of station ids]}
+const stationsByYearsMap = (stationsJson) => {
+  return stationsJson.reduce((obj, station) => {
+    const beginYear = parseInt(station.first.split('-')[0]);
+    return {
+      ...obj,
+      [beginYear]: [...(obj[beginYear] || []), station],
+    };
+  }, {});
+}
+
+
 const getTractData = (properties, key, year=currentYear) => {
+  // Census Tract data only available up to 2017.
+  year = Math.min(year, 2017);
   // The data should be a number
   return properties[year + ' ' + key];
 }

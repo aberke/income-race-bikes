@@ -1,20 +1,8 @@
 /* DOM and things */
 
-
-// Set up station years as an object mapping 
-// {(int)first year for station: [list of station ids]}
-const stationYears = stationsJson.reduce((obj, station) => {
-  const beginYear = parseInt(station.first.split('-')[0]);
-  return {
-    ...obj,
-    [beginYear]: [...(obj[beginYear] || []), station],
-  };
-}, {});
-
-
-
 // Using constants for property keys from the geojson to allow compression (TODO)
 NYC_TRACT_NAME_KEY = 'Neighborhood';
+TRACT_NAME_KEY = 'Name';
 
 TRACT_MEDIAN_INCOME_KEY = 'median income';
 TRACT_MEDIAN_INCOME_MARGIN_OF_ERROR_KEY = 'median income margin of error';
@@ -38,18 +26,20 @@ const tractOtherHouseholdsElt = document.getElementById('tract-other-households'
 const tractTwoOrMoreRacesHouseholdsElt = document.getElementById('tract-two-or-more-races-households');
 const tractTotalHouseholdsElt = document.getElementById('tract-total-households');
 const tractTotalHouseholdsMarginOfErrorElt = document.getElementById('tract-total-households-margin-of-error');
+const hoverForInfoElt = document.getElementById('hover-over-the-map');
 
 
 const fillTractInfoBox = (properties) => {
-  tractNameElt.innerHTML = properties[NYC_TRACT_NAME_KEY];
+  hoverForInfoElt.style.display = "none";
+  tractNameElt.innerHTML = properties[TRACT_NAME_KEY] || properties[NYC_TRACT_NAME_KEY];
   tractMedianIncomeElt.innerHTML = 'Median income: ' + getFormattedMedianIncome(properties, currentYear);
-  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getFormattedPercentWhite(properties, currentYear);
-  tractWhiteHouseholdsElt.innerHTML = 'White households: ' + getFormattedTractData(properties, TRACT_WHITE_HOUSEHOLDS_KEY);
-  tractBlackHouseholdsElt.innerHTML = 'Black households: ' + getFormattedTractData(properties, TRACT_BLACK_HOUSEHOLDS_KEY);
-  tractAsianHouseholdsElt.innerHTML = 'Asian households: ' + getFormattedTractData(properties, TRACT_ASIAN_HOUSEHOLDS_KEY);
-  tractOtherHouseholdsElt.innerHTML = 'Other households: ' + getFormattedTractData(properties, TRACT_OTHER_HOUSEHOLDS_KEY);
-  tractTwoOrMoreRacesHouseholdsElt.innerHTML = 'Households w/ multiple races: ' + getFormattedTractData(properties, TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY);
   tractTotalHouseholdsElt.innerHTML = 'Total households: ' + getFormattedTractData(properties, TRACT_TOTAL_HOUSEHOLDS_KEY);
+  tractPercentWhiteElt.innerHTML = 'Percent of households that are white: ' + getFormattedPercentWhite(properties, currentYear);
+  tractWhiteHouseholdsElt.innerHTML = 'White: ' + getFormattedTractData(properties, TRACT_WHITE_HOUSEHOLDS_KEY);
+  tractBlackHouseholdsElt.innerHTML = 'Black: ' + getFormattedTractData(properties, TRACT_BLACK_HOUSEHOLDS_KEY);
+  tractAsianHouseholdsElt.innerHTML = 'Asian: ' + getFormattedTractData(properties, TRACT_ASIAN_HOUSEHOLDS_KEY);
+  tractOtherHouseholdsElt.innerHTML = 'Other: ' + getFormattedTractData(properties, TRACT_OTHER_HOUSEHOLDS_KEY);
+  tractTwoOrMoreRacesHouseholdsElt.innerHTML = 'Multiple races: ' + getFormattedTractData(properties, TRACT_2_OR_MORE_RACES_HOUSEHOLDS_KEY);
   tractTotalHouseholdsMarginOfErrorElt.innerHTML = 'margin of error: ' + getMarginOfError(properties, currentYear);
 }
 
@@ -64,6 +54,7 @@ const emptyTractInfoBox = () => {
   tractTwoOrMoreRacesHouseholdsElt.innerHTML = '';
   tractTotalHouseholdsElt.innerHTML = '';
   tractTotalHouseholdsMarginOfErrorElt.innerHTML = '';
+  hoverForInfoElt.style.display = "block";
 }
 
 
@@ -75,24 +66,50 @@ const getBikeStationInfoPopup = (station) => {
           </div>`;
 }
 
+const setupCityHTML = (city) => {
+  let cityName = '';
+  if (city === 'boston')
+    cityName = 'Boston Area';
+  else if (city === 'philly')
+    cityName = 'Philadelphia';
+  else if (city === 'nyc')
+    cityName = 'New York City';
+  document.getElementById('city').innerHTML = cityName;
+}
+
+const setupYearButtons = (yearsList) => {
+  let yearSelector = document.getElementById('year-buttons-container');
+  // clear out old buttons
+  yearSelector.innerHTML = null;
+  yearsList.forEach((year) => {
+    let button = document.createElement('button');
+    button.setAttribute('id', 'year-button-' + year.toString());
+    button.innerHTML = year.toString();
+    button.addEventListener('click', () => selectYear(year));
+    yearSelector.appendChild(button);
+  });
+}
+
 const selectYear = (year) => {
   year = parseInt(year);
-  if (year == currentYear) {
+  if (year == currentYear && incomeLayerGroups.length)
     return;
-  }
   let previousYear = currentYear;
   currentYear = year;
-
   redrawMapLayers(previousYear, currentYear);
+  updateYearHTML(year);
+  updateURLParams();
+};
 
+const updateYearHTML = (year) => {
   document.querySelectorAll('button').forEach((btn) => {
     btn.className = '';
-    if (btn.id === 'b-' + year.toString()) {
+    if (btn.id === 'year-button-' + year.toString()) {
       btn.className = 'active';
     }
   });
   yearElt.innerHTML = year.toString();
-};
+}
 
 
 const toggleBikeStationLayer = () => {
@@ -115,13 +132,12 @@ bikeCheck.addEventListener('click', toggleBikeStationLayer);
 incomeCheck.addEventListener('click', toggleIncomeLayer);
 raceCheck.addEventListener('click', toggleRaceLayer);
 
-// const cityData = {
-//   'nyc': {
-//     'stations': link to stations,
-//     'censusTractData': link to geojson
-//   },
-//   ...
-// }
+
+const hideLoadingScreen = () => {
+  document.getElementById('loading-container').style.display = "none";
+}
+
+
 // Handle preselection of checks from URL
 // Because sticky parameters make for better sharing
 
@@ -135,10 +151,13 @@ const URL_PARAM_INCOME = 'i';
 const URL_PARAM_RACE = 'r';
 const URL_PARAM_BIKES = 'b';
 
+const URL_PARAM_HIDE_ABOUT = 'ha';
+
 const setupFromURLParams = () => {
   const urlString = window.location.href;
   let url = new URL(urlString);
-  let city = url.searchParams.get(URL_PARAM_CITY);
+  // set up map info
+  let city = url.searchParams.get(URL_PARAM_CITY) || 'nyc'; // default: NYC
   let year = url.searchParams.get(URL_PARAM_YEAR);
   let i = url.searchParams.get(URL_PARAM_INCOME);
   let r = url.searchParams.get(URL_PARAM_RACE);
@@ -149,30 +168,24 @@ const setupFromURLParams = () => {
     raceCheck.checked = true;
   if (b == null)
     bikeCheck.checked = true;
+  updateYearHTML(year || '');
+  setupCityHTML(city);
+  setupMap(city, year);
 
-  // TODO
-  // if (!city) || !cityData[city])
-    // city = 'nyc';  // Default to this amazing place
-  // stationsJson = cityData[city]['stations'];
-  // censusTractDataGeojson = cityData[city]['censusTractData'];
-  // TODO: handle year
+  // set up map styling
+  let hideAbout = url.searchParams.get(URL_PARAM_HIDE_ABOUT);
+  if (hideAbout != null) 
+    document.body.classList.add('hide-about');
+}
 
-
-  // load the data
-  let xhr = new XMLHttpRequest();
-  xhr.open('GET', './viz/nyc-census-tracts-data.geojson');
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.responseType = 'json';
-  xhr.onload = function() {
-    if (xhr.status !== 200) {
-      console.error('loading geojson returned status code', xhr.status);
-      return;
-    }
-    censusTractDataGeojson = xhr.response;
-    setupMap((!!city) ? city : 'nyc');
-    selectYear((!!year) ? year : 2013);
-  };
-  xhr.send();
+const updateCityURLParam = (city) => {
+  let urlString = window.location.href;
+  let url = new URL(urlString);
+  url.searchParams.set(URL_PARAM_CITY, city);
+  url.searchParams.delete(URL_PARAM_YEAR);
+  window.history.pushState('','',url.toString());
+  setupCityHTML(city);
+  setupMap(city);
 }
 
 const updateURLParams = () => {
@@ -193,8 +206,7 @@ const updateURLParams = () => {
   else 
     url.searchParams.set(URL_PARAM_BIKES, '');
 
-  // TODO
-  // url.searchParams.set(URL_PARAM_YEAR, currentYear);
+  url.searchParams.set(URL_PARAM_YEAR, currentYear);
 
   window.history.pushState('','',url.toString());
 }
