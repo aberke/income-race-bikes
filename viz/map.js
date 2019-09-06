@@ -5,11 +5,11 @@ const MAPBOX_URL = 'https://api.mapbox.com/styles/v1/steifineo/cjyuf2hgv01so1cpe
 
 const NYC_BIKE_DATA_URL = './data/nyc-bike/stations.json';
 const BOSTON_BIKE_DATA_URL = './data/boston-bike/stations.json';
-const PHILLY_BIKE_DATA_URL = 'TODO';
+const PHILLY_BIKE_DATA_URL = './data/philly-bike/stations.json';
 
 const NYC_CENSUS_DATA_URL = './data/ny/nyc_census_tracts.geojson';
 const BOSTON_CENSUS_DATA_URL = './data/ma/ma_census_tracts.geojson';
-const PHILLY_CENSUS_DATA_URL = 'TODO';
+const PHILLY_CENSUS_DATA_URL = './data/philly/philly_census_tracts.geojson';
 
 let stationYears;
 let censusTractDataGeojson;
