@@ -185,10 +185,10 @@ for triplogcsvrp in csvfilerps:
             if station_id not in stations.index:
                 newstation = pd.DataFrame(index=[station_id],
                                           data={'name': [thisstation.start_station.iloc[0]],
-                                                'lat': [thisstation.start_lat.iloc[0]],
-                                                'lon': [thisstation.start_lon.iloc[0]],
-                                                't0_firsttrip': [thisstation.start_time.iloc[0]],
-                                                't0_lasttrip': [thisstation.start_time.iloc[-1]],
+                                                'lat': [thisstation.start_lat.max()], # [thisstation.start_lat.iloc[0]],
+                                                'lon': [thisstation.start_lon.max()], # [thisstation.start_lon.iloc[0]],
+                                                't0_firsttrip': [thisstation.start_time.min()], #[thisstation.start_time.iloc[0]],
+                                                't0_lasttrip': [thisstation.start_time.max()], # [thisstation.start_time.iloc[-1]],
                                                 'nrides': [len(thisstation.index)],
                                                 })
                 # print('In monthly trips csv file {} a new station: {}'.format(triplogcsvrp, newstation))
@@ -203,6 +203,9 @@ for triplogcsvrp in csvfilerps:
 # stations_df = stations_dict_to_df(stations_dict)
 stations.name = stations.name.astype('str')
 stations.head()
+
+# DROP STATIONS THAT HAVE NaN for lat, lon, t0_firsttrip, t0_lasttrip
+stations.drop(stations.index[stations.isnull().any(axis=1)], axis=0, inplace=True)
 
 
 # In[24]:
