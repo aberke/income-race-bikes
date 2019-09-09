@@ -158,7 +158,7 @@ const setupFromURLParams = () => {
   let url = new URL(urlString);
   // set up map info
   let city = url.searchParams.get(URL_PARAM_CITY) || 'nyc'; // default: NYC
-  let year = url.searchParams.get(URL_PARAM_YEAR);
+  let year = url.searchParams.get(URL_PARAM_YEAR) || 2016; // default: 2016
   let i = url.searchParams.get(URL_PARAM_INCOME);
   let r = url.searchParams.get(URL_PARAM_RACE);
   let b = url.searchParams.get(URL_PARAM_BIKES);

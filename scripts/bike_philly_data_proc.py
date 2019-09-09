@@ -29,6 +29,7 @@ import os
 import pandas as pd
 import matplotlib.dates as mdates
 import numpy as np
+import glob
 
 from zipfile import ZipFile
 
@@ -155,57 +156,71 @@ bikedataindir = os.path.join(get_filepath('philly'), 'Downloads')
 stations = pd.DataFrame()
 defaultcolnames = {'plan_duration', 'bike_type', 'start_station', 'trip_route_category', 'bike_id', 'end_station', 'passholder_type', 'duration', 'start_lat', 'start_station_id', 'end_time', 'end_lon', 'start_lon', 'trip_id', 'end_lat', 'end_station_id', 'start_time'}
 I_triplogcsvfiles = 0
-N_triplogcsvfiles = len(os.listdir(bikedataindir))
-for triplogcsvfn in os.listdir(bikedataindir):
-    if not triplogcsvfn.endswith(".csv") or (I_triplogcsvfiles > 2):
-        continue
-    I_triplogcsvfiles += 1
-    print('%d/%d: handling file %s'% (I_triplogcsvfiles, N_triplogcsvfiles, triplogcsvfn))
-    triplogcsvfp = os.path.join(bikedataindir, triplogcsvfn)
-    # Because someone dropped some gnarly mac osx files into their zips
-    # zipfile = ZipFile(triplogcsvfp)
-    # triplogcsvfn = [f.filename for f in zipfile.infolist() if f.filename.endswith('.csv')][0]
-    
-    # stations_df = pd.read_csv(zipfile.open(triplogcsvfn))
-    # stations_df = pd.read_csv(triplogcsvfp, parse_dates=['start_time', 'end_time'])
-    monthlytrips = pd.read_csv(triplogcsvfp, parse_dates=['start_time'])
-    # Because someone can't make data files with uniform column names
-    # stations_df.columns = map(str.lower, stations_df.columns)
-    # stations_df.columns = stations_df.columns.str.replace('[\ ]', '')
-    # transform the dates
-    # stations_df[starttime] = stations_df[starttime].apply(transform_date)
-    for station_id in monthlytrips.start_station.unique():
-        if math.isnan(station_id):
-            print('found nan')
+csvfiles = glob.glob('*.csv')
+N_triplogcsvfiles = len(csvfiles)
+for triplogcsvfn in csvfiles:
+    try:
+        if not triplogcsvfn.endswith(".csv"):
             continue
-        # thisstation = monthlytrips.loc[monthlytrips.start_station == station_id].sort_values(by='start_time').iloc[[0, -1]]
-        thisstation = monthlytrips.loc[monthlytrips.start_station == station_id].sort_values(by='start_time')
-        if station_id not in stations.index:
-            # stations = stations.append(pd.Series(index = station_id,
-            #                                         data = {'name': thisstation.start_station.iloc[0],
-            #                                                 'lat': thisstation.start_lat.iloc[0],
-            #                                                 'lon': thisstation.start_lon.iloc[0],
-            #                                                 't0_firsttrip': thisstation.start_time.iloc[0],
-            #                                                 't0_lasttrip': thisstation.start_time.iloc[-1],
-            #                                                 'nrides': len(thisstation.index),
-            #                                                 }))
-            stations = stations.append(pd.DataFrame(index=[station_id],
-                                                    data={'name': [thisstation.start_station.iloc[0]],
-                                                          'lat': [thisstation.start_lat.iloc[0]],
-                                                          'lon': [thisstation.start_lon.iloc[0]],
-                                                          't0_firsttrip': [thisstation.start_time.iloc[0]],
-                                                          't0_lasttrip': [thisstation.start_time.iloc[-1]],
-                                                          'nrides': [len(thisstation.index)],
-                                                          }))
-        else:
-            stations.at[station_id, 'nrides'] +=  len(thisstation.index)
-        stations.at[station_id, 't0_firsttrip'] = min(stations.at[station_id, 't0_firsttrip'], thisstation.start_time.iloc[0])
-        stations.at[station_id, 't0_lasttrip'] =  max(stations.at[station_id, 't0_lasttrip'], thisstation.start_time.iloc[-1])
-        # if (thisstation.start_time.iloc[0] < stations_dict.at[station_id][FIRST]):
-        #     stations_dict.at[station_id][FIRST] = stations_df[starttime].iloc[0]
-        # if (thisstation.start_time.iloc[-1] > stations_dict.at[station_id][LAST]):
-        #     stations_dict.at[station_id][LAST] = stations[starttime].iloc[-1]
+        I_triplogcsvfiles += 1
+        print('%d/%d: handling file %s'% (I_triplogcsvfiles, N_triplogcsvfiles, triplogcsvfn))
+        triplogcsvfp = os.path.join(bikedataindir, triplogcsvfn)
+        # Because someone dropped some gnarly mac osx files into their zips
+        # zipfile = ZipFile(triplogcsvfp)
+        # triplogcsvfn = [f.filename for f in zipfile.infolist() if f.filename.endswith('.csv')][0]
+
+        # stations_df = pd.read_csv(zipfile.open(triplogcsvfn))
+        # stations_df = pd.read_csv(triplogcsvfp, parse_dates=['start_time', 'end_time'])
+        monthlytrips = pd.read_csv(triplogcsvfp, parse_dates=['start_time'])
+        try:
+            monthlytrips['start_station'] = monthlytrips.start_station_id
+        except Exception as e:
+            continue
+        try:
+            monthlytrips.start_station = monthlytrips.start_station.astype('int')
+        except Exception as e:
+            continue
+        # Because someone can't make data files with uniform column names
+        # stations_df.columns = map(str.lower, stations_df.columns)
+        # stations_df.columns = stations_df.columns.str.replace('[\ ]', '')
+        # transform the dates
+        # stations_df[starttime] = stations_df[starttime].apply(transform_date)
+        for station_id in monthlytrips.start_station.unique():
+            if math.isnan(station_id):
+                print('found nan')
+                continue
+            # thisstation = monthlytrips.loc[monthlytrips.start_station == station_id].sort_values(by='start_time').iloc[[0, -1]]
+            thisstation = monthlytrips.loc[monthlytrips.start_station == station_id].sort_values(by='start_time')
+            if station_id not in stations.index:
+                # stations = stations.append(pd.Series(index = station_id,
+                #                                         data = {'name': thisstation.start_station.iloc[0],
+                #                                                 'lat': thisstation.start_lat.iloc[0],
+                #                                                 'lon': thisstation.start_lon.iloc[0],
+                #                                                 't0_firsttrip': thisstation.start_time.iloc[0],
+                #                                                 't0_lasttrip': thisstation.start_time.iloc[-1],
+                #                                                 'nrides': len(thisstation.index),
+                #                                                 }))
+                stations = stations.append(pd.DataFrame(index=[station_id],
+                                                        data={'name': [thisstation.start_station.iloc[0]],
+                                                              'lat': [thisstation.start_lat.iloc[0]],
+                                                              'lon': [thisstation.start_lon.iloc[0]],
+                                                              't0_firsttrip': [thisstation.start_time.iloc[0]],
+                                                              't0_lasttrip': [thisstation.start_time.iloc[-1]],
+                                                              'nrides': [len(thisstation.index)],
+                                                              }))
+            else:
+                stations.at[station_id, 'nrides'] +=  len(thisstation.index)
+            stations.at[station_id, 't0_firsttrip'] = min(stations.at[station_id, 't0_firsttrip'], thisstation.start_time.iloc[0])
+            stations.at[station_id, 't0_lasttrip'] =  max(stations.at[station_id, 't0_lasttrip'], thisstation.start_time.iloc[-1])
+            # if (thisstation.start_time.iloc[0] < stations_dict.at[station_id][FIRST]):
+            #     stations_dict.at[station_id][FIRST] = stations_df[starttime].iloc[0]
+            # if (thisstation.start_time.iloc[-1] > stations_dict.at[station_id][LAST]):
+            #     stations_dict.at[station_id][LAST] = stations[starttime].iloc[-1]
+    except Exception as e:
+        traceback.print_exc()
+        print(e)
 # stations_df = stations_dict_to_df(stations_dict)
+stations.name = stations.name.astype('str')
 stations.head()
 
 
