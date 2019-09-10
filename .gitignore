@@ -2,3 +2,7 @@ node_modules
 
 .DS_Store
 .ipynb_checkpoints
+/data/philly/AmericanCommunitySurveyDownloads/
+/data/philly/philly_census_tracts_shapefile_2010/
+/data/philly/TractShapefileDownloads/
+/data/philly-bike/Downloads/
