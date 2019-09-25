@@ -41,7 +41,7 @@ As of August 2019, this race and income data is [only available up to 2017](http
 Margins of error are not shown on the map, but are available with all of the processed data here.
 
 
-##### Obtaining and processing the Census Data
+#### Obtaining and processing the Census Data
 
 
 The processing is divided into two parts:
@@ -69,12 +69,13 @@ For state census data:
 	- And then for __each year__ of interest download data for 5-year estimates (e.g. "2014 ACS 5-year estimates")
 		- years of interest: beginning of bike sharing program to most recent
 	- Select a geographic type: "Census Tract - 140"
-	- Select state --> Add to selection --> Next
+		- be careful not to select "Census Tract (or part) - 080"
+	- Select state --> Select all Census Tract within [state] --> Add to selection --> Next
 	- Select tables (can use search) and download CSVs for tables 1 by 1 (tedious)
-		- race as "RACE"
-		- median income as "MEDIAN INCOME IN THE PAST 12 MONTHS (IN <year> INFLATION-ADJUSTED DOLLARS)"
+		- race as "RACE" (ID:B02001)
+		- median income as "MEDIAN INCOME IN THE PAST 12 MONTHS (IN <year> INFLATION-ADJUSTED DOLLARS)" (ID:S1903)
 		- <img src="./docs/using-factfinder-ma-income.png">
-	- Download each table and open zipfile.  The name of the relevant csv within looks something like "ACS_[yr]_5YR_S1903_with_ann.csv" but double check the file
+	- Download each table and open zipfile.  The name of the relevant csv within looks something like "ACS_[yr]_5YR_B02001_with_ann.csv"(race) or "ACS_[yr]_5YR_S1903_with_ann.csv"(income) but double check the file
 	- Rename the relevant CSV as "[state]\_[yr]\_[income|race].csv" and save it in the /data/[state]/ directory
 		- e.g. 2011 income data for MA from ACS 5-year estimates is saved to "/data/ma/ma_2011_income.csv"
 
