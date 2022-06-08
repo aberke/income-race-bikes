@@ -7,10 +7,12 @@ const MAPBOX_URL =
 const NYC_BIKE_DATA_URL = "./data/nyc-bike/stations.json";
 const BOSTON_BIKE_DATA_URL = "./data/boston-bike/stations.json";
 const PHILLY_BIKE_DATA_URL = "TODO";
+const HOU_BIKE_DATA_URL = "TODO";
 
 const NYC_CENSUS_DATA_URL = "./data/ny/ny_census_tracts.geojson";
 const BOSTON_CENSUS_DATA_URL = "./data/ma/ma_census_tracts.geojson";
 const PHILLY_CENSUS_DATA_URL = "TODO";
+const HOU_CENSUS_DATA_URL = "./data/tx/tx_census_tracts.geojson";
 
 let stationYears;
 let censusTractDataGeojson;
@@ -29,6 +31,7 @@ const MAX_ZOOM_LEVEL = 18;
 const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242]; // Location: The Recurse Center
 const MAP_START_VIEW_CENTER_BOSTON = [42.3607572, -71.0993565]; // Location: MIT
 const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
+const MAP_START_VIEW_CENTER_HOU = [29.7602, 95.3694];
 
 const setupMap = (city, year) => {
   // Order of things:
@@ -49,10 +52,14 @@ const setupMap = (city, year) => {
     mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
     bikeDataURL = PHILLY_BIKE_DATA_URL;
     censusDataURL = PHILLY_CENSUS_DATA_URL;
-  } else {
+  } else if (city == "nyc") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
     bikeDataURL = NYC_BIKE_DATA_URL;
     censusDataURL = NYC_CENSUS_DATA_URL;
+  } else if (city == "houston") {
+    mapStartViewCenter = MAP_START_VIEW_CENTER_HOU;
+    bikeDataURL = NYC_BIKE_DATA_URL;
+    censusDataURL = HOU_CENSUS_DATA_URL;
   }
   // set these to null again in the case this is a redraw
   censusTractInfoLayerGroup = null;
