@@ -52,14 +52,14 @@ const setupMap = (city, year) => {
     mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
     bikeDataURL = PHILLY_BIKE_DATA_URL;
     censusDataURL = PHILLY_CENSUS_DATA_URL;
-  } else if (city == "nyc") {
-    mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
-    bikeDataURL = NYC_BIKE_DATA_URL;
-    censusDataURL = NYC_CENSUS_DATA_URL;
   } else if (city == "houston") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_HOU;
     bikeDataURL = NYC_BIKE_DATA_URL;
     censusDataURL = HOU_CENSUS_DATA_URL;
+  } else {
+    mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
+    bikeDataURL = NYC_BIKE_DATA_URL;
+    censusDataURL = NYC_CENSUS_DATA_URL;
   }
   // set these to null again in the case this is a redraw
   censusTractInfoLayerGroup = null;
