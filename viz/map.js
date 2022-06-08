@@ -31,7 +31,7 @@ const MAX_ZOOM_LEVEL = 18;
 const MAP_START_VIEW_CENTER_NYC = [40.691425, -73.987242]; // Location: The Recurse Center
 const MAP_START_VIEW_CENTER_BOSTON = [42.3607572, -71.0993565]; // Location: MIT
 const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
-const MAP_START_VIEW_CENTER_HOU = [29.7602, 95.3694];
+const MAP_START_VIEW_CENTER_HOU = [29.7602, -95.3694];
 
 const setupMap = (city, year) => {
   // Order of things:
