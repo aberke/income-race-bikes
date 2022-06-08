@@ -97,6 +97,7 @@ const setupCityHTML = (city) => {
   if (city === "boston") cityName = "Boston Area";
   else if (city === "philly") cityName = "Philadelphia";
   else if (city === "nyc") cityName = "New York City";
+  else if (city == "houston") cityName = "Houston";
   document.getElementById("city").innerHTML = cityName;
 };
 
