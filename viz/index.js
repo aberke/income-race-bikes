@@ -98,6 +98,8 @@ const setupCityHTML = (city) => {
   else if (city === "philly") cityName = "Philadelphia";
   else if (city === "nyc") cityName = "New York City";
   else if (city == "houston") cityName = "Houston";
+  else if (city == "dc") cityName = "Washington DC";
+  else if (city == "chicago") cityName = "Chicago";
   document.getElementById("city").innerHTML = cityName;
 };
 
