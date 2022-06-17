@@ -31,7 +31,7 @@ Income and race data is provided for each year by census tract. It is from the [
 The data used for this map is household median income, and household race.
 \*Race is displayed on the map as “Percent White”, which is calculated as the percentage of households that report “white only” in a given census tract.
 
-As of August 2019, this race and income data is [only available up to 2017](https://www.census.gov/programs-surveys/acs/news/data-releases/2018/release.html), so the map shows the same 2017 data for years 2018 and 2019.
+As of June 2022, this race and income data is [only available up to 2020](https://www.census.gov/programs-surveys/acs/news/data-releases/2018/release.html), so the map shows the same 2020 data for years 2021 and 2022.
 Margins of error are not shown on the map, but are available with all of the processed data here.
 
 #### Obtaining and processing the Census Data
@@ -50,28 +50,9 @@ For shapefile:
 
 - Get shapefile for census tracts
 - Possibly prune the shapefile to only include census tracts
-- Process the shapefile to have geoids at census tract granularity - To better understand geoids, see https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html - For processing, see /scripts
+- Process the shapefile to have geoids at census tract granularity
+- To better understand geoids, see https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html - For processing, see /scripts
   This shapefile is (inner-) joined with the given state's census data
-
-##### old census
-
-For state census data:
-
-- Download the data by going to https://factfinder.census.gov/faces/nav/jsf/pages/download_center.xhtml (OMG this site has some _wild_ 90's era graphics)
-  - Choose "I know the dataset or table(s) that I want to download."
-  - Select "American Community Survey"
-  - And then for **each year** of interest download data for 5-year estimates (e.g. "2014 ACS 5-year estimates")
-    - years of interest: beginning of bike sharing program to most recent
-  - Select a geographic type: "Census Tract - 140"
-    - be careful not to select "Census Tract (or part) - 080"
-  - Select state --> Select all Census Tract within [state] --> Add to selection --> Next
-  - Select tables (can use search) and download CSVs for tables 1 by 1 (tedious)
-    - race as "RACE" (ID:B02001)
-    - median income as "MEDIAN INCOME IN THE PAST 12 MONTHS (IN <year> INFLATION-ADJUSTED DOLLARS)" (ID:S1903)
-    - <img src="./docs/using-factfinder-ma-income.png">
-  - Download each table and open zipfile. The name of the relevant csv within looks something like "ACS*[yr]\_5YR_B02001_with_ann.csv"(race) or "ACS*[yr]\_5YR_S1903_with_ann.csv"(income) but double check the file
-  - Rename the relevant CSV as "[state]\_[yr]\_[income|race].csv" and save it in the /data/[state]/ directory
-    - e.g. 2011 income data for MA from ACS 5-year estimates is saved to "/data/ma/ma_2011_income.csv"
 
 ##### New Census
 
@@ -94,7 +75,7 @@ For state census data:
 
   - Click "DOWNLOAD TABLE", select the years you want to download, click "DOWNLOAD.CSV", and wait for prompt to say download is ready at the bottom of the screen
   - If the downnload doesn't start up, click the download button again then a .zip file should be downloaded.
-  - The relevant file should be called "ACSDT5Y[year].[code]\_data_with_overlays_2022-04-14T225511.csv", [code] being B02001 for race and S1903 for income.
+  - The relevant file should be called "ACSDT5Y[year].[code]\_data*with_overlays*[time downloaded].csv", [code] being B02001 for race and S1903 for income.
   - Rename the relevant CSV as "[state]\_[yr]\_[income|race].csv"
     (Someone thought they were funny and put the ID and tract name at the end of the table for the Race chart and at the front of the table for the income chart)
 
