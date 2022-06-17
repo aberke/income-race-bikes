@@ -16,7 +16,7 @@ const BOSTON_CENSUS_DATA_URL = "./data/ma/ma_census_tracts.geojson";
 const PHILLY_CENSUS_DATA_URL = "TODO";
 const HOU_CENSUS_DATA_URL = "./data/tx/tx_census_tracts.geojson";
 const DC_CENSUS_DATA_URL = "./data/dc/dc_census_tracts.geojson";
-const CHICAGO_CENSUS_DATA_URL = "TODO";
+const CHICAGO_CENSUS_DATA_URL = "./data/il/il_census_tracts.geojson";
 
 let stationYears;
 let censusTractDataGeojson;
@@ -69,7 +69,7 @@ const setupMap = (city, year) => {
   } else if (city == "chicago") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_CHICAGO;
     bikeDataURL = CHICAGO_BIKE_DATA_URL;
-    censusDataURL = NYC_CENSUS_DATA_URL;
+    censusDataURL = CHICAGO_CENSUS_DATA_URL;
   } else {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
     bikeDataURL = NYC_BIKE_DATA_URL;
