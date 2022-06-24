@@ -35,8 +35,8 @@ const stationsByYearsMap = (stationsJson) => {
 };
 
 const getTractData = (properties, key, year = currentYear) => {
-  // Census Tract data only available up to 2020.
-  year = Math.min(year, 2020);
+  // Census Tract data only available up to 2019.
+  year = Math.min(year, 2019);
   // The data should be a number
   return properties[year + " " + key];
 };

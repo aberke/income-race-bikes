@@ -6,17 +6,19 @@ const MAPBOX_URL =
 
 const NYC_BIKE_DATA_URL = "./data/nyc-bike/stations.json";
 const BOSTON_BIKE_DATA_URL = "./data/boston-bike/stations.json";
-const PHILLY_BIKE_DATA_URL = "TODO";
+const PHILLY_BIKE_DATA_URL = "./data/philly-bike/stations.json";
 const HOU_BIKE_DATA_URL = "TODO";
 const DC_BIKE_DATA_URL = "./data/dc-bike/stations.json";
 const CHICAGO_BIKE_DATA_URL = "./data/chicago-bike/stations.json";
+const LA_BIKE_DATA_URL = "./data/la-bike/stations.json";
 
 const NYC_CENSUS_DATA_URL = "./data/ny/ny_census_tracts.geojson";
 const BOSTON_CENSUS_DATA_URL = "./data/ma/ma_census_tracts.geojson";
-const PHILLY_CENSUS_DATA_URL = "TODO";
+const PHILLY_CENSUS_DATA_URL = "./data/pa/pa_census_tracts.geojson";
 const HOU_CENSUS_DATA_URL = "./data/tx/tx_census_tracts.geojson";
 const DC_CENSUS_DATA_URL = "./data/dc/dc_census_tracts.geojson";
 const CHICAGO_CENSUS_DATA_URL = "./data/il/il_census_tracts.geojson";
+const LA_CENSUS_DATA_URL = "./data/socal/socal_census_tracts.geojson";
 
 let stationYears;
 let censusTractDataGeojson;
@@ -38,6 +40,7 @@ const MAP_START_VIEW_CENTER_PHILLY = [39.952876, -75.164035];
 const MAP_START_VIEW_CENTER_HOU = [29.7602, -95.3694];
 const MAP_START_VIEW_CENTER_DC = [38.9072, -77.0369];
 const MAP_START_VIEW_CENTER_CHICAGO = [41.8781, -87.6298];
+const MAP_START_VIEW_CENTER_LA = [34.0522, -118.2437];
 
 const setupMap = (city, year) => {
   // Order of things:
@@ -70,6 +73,10 @@ const setupMap = (city, year) => {
     mapStartViewCenter = MAP_START_VIEW_CENTER_CHICAGO;
     bikeDataURL = CHICAGO_BIKE_DATA_URL;
     censusDataURL = CHICAGO_CENSUS_DATA_URL;
+  } else if (city == "la") {
+    mapStartViewCenter = MAP_START_VIEW_CENTER_LA;
+    bikeDataURL = LA_BIKE_DATA_URL;
+    censusDataURL = LA_CENSUS_DATA_URL;
   } else {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
     bikeDataURL = NYC_BIKE_DATA_URL;
@@ -141,7 +148,6 @@ const setupMap = (city, year) => {
       addCensusTractInfoLayer();
       // set up data viz - with okay year
       if (!year || years.indexOf(year) < 0) year = years[0];
-      selectYear(year);
       hideLoadingScreen();
       // called again here as a hack: otherwise on resetups of map, the layers
       // were not immediately redrawn
@@ -223,14 +229,14 @@ const addCensusTractInfoLayer = () => {
 };
 
 const removeRaceLayer = (year = currentYear) => {
-  year = year > 2020 ? 2020 : year;
+  year = year > 2019 ? 2019 : year;
   if (!!raceLayerGroups[year] && map.hasLayer(raceLayerGroups[year]))
     map.removeLayer(raceLayerGroups[year]);
 };
 
 const addRaceLayer = (year = currentYear) => {
   // Census data only goes up to 2017, so 2017 data used for years onward
-  year = year > 2020 ? 2020 : year;
+  year = year > 2019 ? 2019 : year;
   if (!raceLayerGroups[year])
     raceLayerGroups[year] = L.geoJson(censusTractDataGeojson, {
       style: raceStyle(year),
@@ -240,14 +246,14 @@ const addRaceLayer = (year = currentYear) => {
 };
 
 const removeIncomeLayer = (year = currentYear) => {
-  year = year > 2020 ? 2020 : year;
+  year = year > 2019 ? 2019 : year;
   if (!!incomeLayerGroups[year] && map.hasLayer(incomeLayerGroups[year]))
     map.removeLayer(incomeLayerGroups[year]);
 };
 
 const addIncomeLayer = (year = currentYear) => {
   // Census data only goes up to 2017, so 2017 data used for years onward
-  year = year > 2020 ? 2020 : year;
+  year = year > 2019 ? 2019 : year;
   if (!incomeLayerGroups[year])
     incomeLayerGroups[year] = L.geoJson(censusTractDataGeojson, {
       style: incomeStyle(year),
