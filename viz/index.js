@@ -96,8 +96,6 @@ const setupCityHTML = (city) => {
   let cityName = "";
   if (city === "boston") cityName = "Boston Area";
   else if (city === "philly") cityName = "Philadelphia";
-  else if (city === "nyc") cityName = "New York City";
-  else if (city == "houston") cityName = "Houston";
   else if (city == "dc") cityName = "Washington DC";
   else if (city == "chicago") cityName = "Chicago";
   document.getElementById("city").innerHTML = cityName;
@@ -150,12 +148,19 @@ const toggleIncomeLayer = () => {
   redrawMapLayers(currentYear, currentYear);
 };
 
+const toggleBorderLayer = () => {
+  updateURLParams();
+  redrawMapLayers(currentYear, currentYear);
+};
+
 const bikeCheck = document.getElementById("b-bikes");
 const incomeCheck = document.getElementById("b-income");
 const raceCheck = document.getElementById("b-race");
+const borderCheck = document.getElementById("b-border");
 bikeCheck.addEventListener("click", toggleBikeStationLayer);
 incomeCheck.addEventListener("click", toggleIncomeLayer);
 raceCheck.addEventListener("click", toggleRaceLayer);
+borderCheck.addEventListener("click", toggleBorderLayer);
 
 const hideLoadingScreen = () => {
   document.getElementById("loading-container").style.display = "none";
@@ -173,6 +178,7 @@ const URL_PARAM_YEAR = "year";
 const URL_PARAM_INCOME = "i";
 const URL_PARAM_RACE = "r";
 const URL_PARAM_BIKES = "b";
+const URL_PARAM_BORDER = "l";
 
 const URL_PARAM_HIDE_ABOUT = "ha";
 
@@ -185,9 +191,11 @@ const setupFromURLParams = () => {
   let i = url.searchParams.get(URL_PARAM_INCOME);
   let r = url.searchParams.get(URL_PARAM_RACE);
   let b = url.searchParams.get(URL_PARAM_BIKES);
+  let l = url.searchParams.get(URL_PARAM_BORDER);
   if (i == null) incomeCheck.checked = true;
   if (r == null) raceCheck.checked = true;
   if (b == null) bikeCheck.checked = true;
+  if (l == null) borderCheck.checked = true;
   updateYearHTML(year || "");
   setupCityHTML(city);
   setupMap(city, year);
@@ -210,6 +218,9 @@ const updateCityURLParam = (city) => {
 const updateURLParams = () => {
   let urlString = window.location.href;
   let url = new URL(urlString);
+  if (borderCheck.checked) url.searchParams.delete(URL_PARAM_BORDER);
+  else url.searchParams.set(URL_PARAM_BORDER, "");
+
   if (incomeCheck.checked) url.searchParams.delete(URL_PARAM_INCOME);
   else url.searchParams.set(URL_PARAM_INCOME, "");
 

@@ -20,11 +20,19 @@ const DC_CENSUS_DATA_URL = "./data/dc/dc_census_tracts.geojson";
 const CHICAGO_CENSUS_DATA_URL = "./data/il/il_census_tracts.geojson";
 const LA_CENSUS_DATA_URL = "./data/socal/socal_census_tracts.geojson";
 
+const DC_BORDER_URL = "./data/dc/dc_limits.geojson";
+const BOSTON_BORDER_URL = "./data/ma/boston_limits.geojson";
+const CHICAGO_BORDER_URL = "./data/il/chicago_limits.geojson";
+const NYC_BORDER_URL = "./data/ny/nyc_limits.geojson";
+const PHILLY_BORDER_URL = "./data/pa/philly_limits.geojson";
+
 let stationYears;
 let censusTractDataGeojson;
+let borderGeojson;
 
 let map;
 let censusTractInfoLayerGroup;
+let borderLayer;
 
 // Create the layers from geojson features as they are needed and cache them for reuse
 let raceLayerGroups, incomeLayerGroups, bikeStationMarkerLayerGroups;
@@ -51,28 +59,28 @@ const setupMap = (city, year) => {
   // draw layers
   // hide loading screen
 
-  let mapStartViewCenter, bikeDataURL, censusDataURL;
+  let mapStartViewCenter, bikeDataURL, censusDataURL, borderURL;
 
   if (city === "boston") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_BOSTON;
     bikeDataURL = BOSTON_BIKE_DATA_URL;
     censusDataURL = BOSTON_CENSUS_DATA_URL;
+    borderURL = BOSTON_BORDER_URL;
   } else if (city === "philly") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_PHILLY;
     bikeDataURL = PHILLY_BIKE_DATA_URL;
     censusDataURL = PHILLY_CENSUS_DATA_URL;
-  } else if (city == "houston") {
-    mapStartViewCenter = MAP_START_VIEW_CENTER_HOU;
-    bikeDataURL = NYC_BIKE_DATA_URL;
-    censusDataURL = HOU_CENSUS_DATA_URL;
+    borderURL = PHILLY_BORDER_URL;
   } else if (city == "dc") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_DC;
     bikeDataURL = DC_BIKE_DATA_URL;
     censusDataURL = DC_CENSUS_DATA_URL;
+    borderURL = DC_BORDER_URL;
   } else if (city == "chicago") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_CHICAGO;
     bikeDataURL = CHICAGO_BIKE_DATA_URL;
     censusDataURL = CHICAGO_CENSUS_DATA_URL;
+    borderURL = CHICAGO_BORDER_URL;
   } else if (city == "la") {
     mapStartViewCenter = MAP_START_VIEW_CENTER_LA;
     bikeDataURL = LA_BIKE_DATA_URL;
@@ -81,8 +89,10 @@ const setupMap = (city, year) => {
     mapStartViewCenter = MAP_START_VIEW_CENTER_NYC;
     bikeDataURL = NYC_BIKE_DATA_URL;
     censusDataURL = NYC_CENSUS_DATA_URL;
+    borderURL = NYC_BORDER_URL;
   }
   // set these to null again in the case this is a redraw
+  borderLayer = null;
   censusTractInfoLayerGroup = null;
   raceLayerGroups = {};
   incomeLayerGroups = {};
@@ -127,7 +137,6 @@ const setupMap = (city, year) => {
   });
   map.addLayer(mapboxTilesLayer);
   map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
-
   // load bike station data
   loadJsonData(bikeDataURL, function (bikeData) {
     stationYears = stationsByYearsMap(bikeData);
@@ -151,6 +160,10 @@ const setupMap = (city, year) => {
       hideLoadingScreen();
       // called again here as a hack: otherwise on resetups of map, the layers
       // were not immediately redrawn
+      loadJsonData(borderURL, function (borderData) {
+        borderGeojson = borderData;
+        addBorderLayer();
+      });
       map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
     });
   });
@@ -168,6 +181,8 @@ const redrawMapLayers = (
   // aesthetics and clickability
   // Map layer order:
   // race, income, info, bikes
+  removeBorderLayer();
+  if (borderCheck.checked) addBorderLayer();
 
   removeRaceLayer(previousYear);
   if (raceCheck.checked) addRaceLayer(year);
@@ -178,7 +193,6 @@ const redrawMapLayers = (
   // Make the census tract info layer once (in setup)
   // then make sure it is always on top (but below bikes)
   redrawCensusTractInfoLayer();
-
   removeBikeStationLayer(previousYear);
   if (bikeCheck.checked) addBikeStationLayer(year);
 };
@@ -259,6 +273,29 @@ const addIncomeLayer = (year = currentYear) => {
       style: incomeStyle(year),
     });
   map.addLayer(incomeLayerGroups[year]);
+};
+
+const addBorderLayer = () => {
+  if (!borderLayer) makeBorderLayer();
+  map.addLayer(borderLayer);
+};
+
+const removeBorderLayer = () => {
+  if (borderLayer && map.hasLayer(borderLayer)) {
+    map.removeLayer(borderLayer);
+  }
+};
+
+const makeBorderLayer = () => {
+  borderLayer = L.geoJson(borderGeojson, {
+    style: {
+      stroke: true,
+      // '#F5F5F5',
+      color: "red",
+      strokewidth: 3,
+      fill: false,
+    },
+  });
 };
 
 const removeBikeStationLayer = (year = currentYear) => {
