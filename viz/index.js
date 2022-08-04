@@ -179,7 +179,7 @@ const URL_PARAM_YEAR = "year";
 const URL_PARAM_INCOME = "i";
 const URL_PARAM_RACE = "r";
 const URL_PARAM_BIKES = "b";
-const URL_PARAM_BORDER = "l";
+const UR_PARAM_STUDY_BOUNDARY = "study-boundary";
 
 const URL_PARAM_HIDE_ABOUT = "ha";
 
@@ -192,19 +192,19 @@ const setupFromURLParams = () => {
   let i = url.searchParams.get(URL_PARAM_INCOME);
   let r = url.searchParams.get(URL_PARAM_RACE);
   let b = url.searchParams.get(URL_PARAM_BIKES);
-  // let l = url.searchParams.get(URL_PARAM_BORDER);
   if (i == null) incomeCheck.checked = true;
   if (r == null) raceCheck.checked = true;
   if (b == null) bikeCheck.checked = true;
-  // if (l == null) borderCheck.checked = true;
+
   updateYearHTML(year || "");
   setupCityHTML(city);
   setupMap(city, year);
 
   // set up map styling
   let hideAbout = url.searchParams.get(URL_PARAM_HIDE_ABOUT);
-  let limitLayer = url.searchParams.get(URL_PARAM_BORDER);
+  let limitLayer = url.searchParams.get(URL_PARAM_STUDY_BOUNDARY);
   if (hideAbout != null) document.body.classList.add("hide-about");
+
   if (limitLayer != null) {
     borderCheck = true;
   } else {
