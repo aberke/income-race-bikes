@@ -55,8 +55,8 @@ For shapefile:
   This shapefile is (inner-) joined with the given state's census data
 
 For state census data:
--Download the data by going to https://data.census.gov/cedsci/table?q=american%20community%20survey
 
+- Download the data by going to https://data.census.gov/cedsci/table?q=american%20community%20survey
 - Select "Geography"
 - Then "Tract"
 - Select state --> Select all Census Tracts within [state]
@@ -65,17 +65,14 @@ For state census data:
   - Go to the "Race and Ethnicity" FOlder then click the box for "Race and Ethnicity"
   - Scroll down available datasets until B02001: RACE
 - Get to income table:
-
   - Go to topics again and select Income and Poverty
   - Select the table "S1903 | MEDIAN INCOME IN THE PAST 12 MONTHS (IN [year] INFLATION-ADJUSTED DOLLARS)"
 
 - Download the files:
-
   - Click "DOWNLOAD TABLE", select the years you want to download, click "DOWNLOAD.CSV", and wait for prompt to say download is ready at the bottom of the screen
   - If the downnload doesn't start up, click the download button again then a .zip file should be downloaded.
   - The relevant file should be called "ACSDT5Y[year].[code]\_data_with_overlays\_[time downloaded].csv", [code] being B02001 for race and S1903 for income.
   - Rename the relevant CSV as "[state]\_[yr]\_[income|race].csv"
-    (Someone thought they were funny and put the ID and tract name at the end of the table for the Race chart and at the front of the table for the income chart)
 
 - Process all of the csv data files for the state into one file by running /scripts/census_data_processing (with jupyter)
 
