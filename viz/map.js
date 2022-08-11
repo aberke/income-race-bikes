@@ -160,10 +160,12 @@ const setupMap = (city, year) => {
       hideLoadingScreen();
       // called again here as a hack: otherwise on resetups of map, the layers
       // were not immediately redrawn
+
       loadJsonData(borderURL, function (borderData) {
         borderGeojson = borderData;
         if (borderCheck) addBorderLayer();
       });
+      selectYear(year);
       map.setView(mapStartViewCenter, INITIAL_ZOOM_LEVEL);
     });
   });
@@ -181,9 +183,6 @@ const redrawMapLayers = (
   // aesthetics and clickability
   // Map layer order:
   // race, income, info, bikes
-  removeBorderLayer();
-  if (borderCheck) addBorderLayer();
-
   removeRaceLayer(previousYear);
   if (raceCheck.checked) addRaceLayer(year);
 

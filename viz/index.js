@@ -179,7 +179,7 @@ const URL_PARAM_YEAR = "year";
 const URL_PARAM_INCOME = "i";
 const URL_PARAM_RACE = "r";
 const URL_PARAM_BIKES = "b";
-const UR_PARAM_STUDY_BOUNDARY = "study-boundary";
+const URL_PARAM_STUDY_BOUNDARY = "study-boundary";
 
 const URL_PARAM_HIDE_ABOUT = "ha";
 
