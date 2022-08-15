@@ -317,10 +317,10 @@ const addBikeStationLayer = (year = currentYear) => {
 const createBikeStationLayerGroup = (year) => {
   let bikeStationMarkerLayerGroup = L.layerGroup();
   let firstYear = Object.keys(stationYears)[0];
-  for (let i = firstYear; i < currentYear + 1; i++) {
+  for (let i = firstYear; i < year + 1; i++) {
     const stations = stationYears[i] || [];
     stations.forEach((station) => {
-      if (station.last < currentYear) {
+      if (parseInt(station.last) < year) {
         console.log("found a disappearing station!", station);
         return;
       }
