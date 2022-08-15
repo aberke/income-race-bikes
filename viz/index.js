@@ -86,9 +86,11 @@ const emptyTractInfoBox = () => {
 
 const getBikeStationInfoPopup = (station) => {
   let dateString = new Date(station.first).toDateString();
+  let lastDateString = new Date(station.last).toDateString();
   return `<div class='bike-station-info-popup'>
             <p class='bike-station-name'>${station.name}</p>
             <p>First ride: ${dateString}</p>
+            <p>Last ride: ${lastDateString}</p>
           </div>`;
 };
 
