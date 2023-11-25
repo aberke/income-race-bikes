@@ -97,3 +97,10 @@ This data is used to find the first trip originating from each bike dock station
 Can use URL parameter `?ha` to hide the about section and have the map take up the full height of the frame. This is useful when embedding in an iframe.
 
 Can also use parameter `?study-boundary` to toggle the boundy of the region studied for each city.
+
+
+## Quantiative analysis and publication
+
+This repository also contains analysis notebooks for our paper.
+
+> Berke, A., Truitt, W., Larson, K. (2023). Is access to public bike-share networks equitable? A multiyear spatial analysis across 5 U.S. Cities. Journal of Transport Geography, Volume 114, 2024, 103759, ISSN 0966-6923. https://doi.org/10.1016/j.jtrangeo.2023.103759.
